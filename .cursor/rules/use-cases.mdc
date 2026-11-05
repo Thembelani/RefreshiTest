@@ -1,0 +1,28 @@
+---
+description: Application use cases between blocs and repositories
+globs: lib/application/**/*.dart
+alwaysApply: false
+---
+
+# Use cases
+
+- Implement `UseCase<EntityType, Params>` from `i_usecase.dart`. `call` returns `TaskEither<BaseFailure, EntityType>`.
+- No arguments: use `NoParams` (`equatable`, `const NoParams()`).
+- Annotate `@LazySingleton()`. Inject the **interface** (`ICatalogRepository`), not the concrete repository.
+- Delegate only; no GraphQL or mapping here.
+
+```dart
+@LazySingleton()
+class GetCatalogItemsUseCase
+    implements UseCase<List<CatalogItemEntity>, NoParams> {
+  GetCatalogItemsUseCase(this.repository);
+  final ICatalogRepository repository;
+
+  @override
+  TaskEither<BaseFailure, List<CatalogItemEntity>> call(NoParams params) {
+    return repository.getCatalogItems();
+  }
+}
+```
+
+- Blocs run with `await useCase.call(const NoParams()).run()` then `result.fold(...)`.

@@ -1,0 +1,15 @@
+---
+description: Widget, bloc, and repository tests
+globs: test/**/*.dart
+alwaysApply: false
+---
+
+# Tests
+
+- Use **mocktail**, not Mockito. Share mocks in `test/mocks.dart`. Do not add `bloc_test` unless it resolves on Dart 3.10.4; drive blocs with `add` + `pumpEventQueue` / `fakeAsync`.
+- Auth 2s delay: construct the bloc **inside** `fakeAsync`, or `tester.pump(const Duration(seconds: 2))` then another `pump`/`pumpAndSettle` so listeners can navigate.
+- Widget tests using `RefreshiApp` / screens with blocs: `await getIt.reset(); await configureDependencies();` in `setUp`. Wrap isolated screens with `GlobalProvider.create`.
+- Never `BlocProvider(create: (_) => getIt<AuthBloc>())` — that closes the singleton. Use `.value`.
+- Repository tests mock the Graph client; use the real AutoMappr mapper. Assert `isA<GetCatalogItemFailure>()` (`BaseFailure` has no `==`).
+- Catalog UI uses **mock GraphQL names/prices** (Berry Latte, Copper Draught, 4550 cents), not the generated `catalogItems` dummy list.
+- Prefer existing `Key`s (`login-email`, `catalog-logo`, …) over brittle text-only finders where both exist.

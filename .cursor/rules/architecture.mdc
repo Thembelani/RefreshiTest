@@ -1,0 +1,18 @@
+---
+description: Clean-architecture data flow for new features
+alwaysApply: true
+---
+
+# Architecture
+
+New slices follow this direction only:
+
+```
+Screen → Bloc → UseCase → IRepository → Repository + GraphClient + AutoMappr → Entity
+```
+
+- Blocs depend on **use cases**, not repositories or GraphQL clients.
+- GraphQL generated types stay in `infrastructure`. Map to `*Entity` in the repository.
+- UI view models (`CatalogItem`, `CartLine`, `CatalogService`) stay in `presentation`. Do not put Flutter types (`IconData`, `Color`) in `domain`.
+- `bootstrap` = app wiring (router, theme, `GlobalProvider`). `shared` = cross-cutting helpers only.
+- Failures: domain `BaseFailure` subclasses. GraphQL: `BaseGraphError` + `toFailure()` in `infrastructure/mappers`.

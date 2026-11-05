@@ -1,0 +1,23 @@
+---
+description: flutter_bloc + Freezed events/state and where to dispatch
+globs: lib/presentation/state/**/*.dart,lib/presentation/screens/**/*.dart
+alwaysApply: false
+---
+
+# BLoC
+
+- One folder per bloc. `*_bloc.dart` has `part` of `*_event.dart`, `*_state.dart`, `*_bloc.freezed.dart`.
+- Events: `@freezed sealed class`. State: `@freezed abstract class`. Both `part of 'the_bloc.dart';`.
+- `on<TheEvent>` then `await event.when(...)`. Inject use cases, not repositories.
+- State: `DataStatus` (`none`, `loading`, `success`, `error`) plus domain data / `BaseFailure?`.
+- Load in **`State.initState`** with `context.read<TheBloc>()` (safe). Never `add` in `build`. `context.watch` is not allowed in `initState`.
+
+```dart
+final bloc = context.read<CatalogItemsBloc>();
+if (bloc.state.status == DataStatus.none) {
+  bloc.add(const CatalogItemsEvent.getCatalogItems());
+}
+```
+
+- Navigate in `BlocListener` / `BlocConsumer` on the screen that should react. Use `listenWhen` so login success and sign-out success are not treated as the same.
+- Auth `signIn` / `signOut` currently `await Future.delayed(const Duration(seconds: 2))` then `DataStatus.success`. Keep that until a real auth use case is asked for.

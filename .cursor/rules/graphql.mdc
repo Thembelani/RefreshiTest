@@ -1,0 +1,15 @@
+---
+description: Typed GraphQL client, codegen, mocks, mapping, errors
+globs: lib/infrastructure/**/*.dart,lib/infrastructure/**/*.graphql,build.yaml
+alwaysApply: false
+---
+
+# GraphQL and infrastructure
+
+- Schema: `datasources/graphql/schema.graphql`. Operations: `datasources/graphql/operations/*.graphql` (e.g. `query GetCatalogItems { getCatalogItems { id name sellingPrice } }`).
+- `build.yaml`: `graphql_codegen` `clients: [graphql]`. Generated files are **libraries** — `import '*.graphql.dart'`. auto_mappr 2: `import 'foo.auto_mappr.dart'` (not `part`).
+- Layout: `graphql_client.dart` (transport) beside `clients/` (`CatalogItemGraphClient`). Client methods return `TaskEither<BaseGraphError, T>` via `TaskEither.tryCatch` + `query$GetCatalogItems()`.
+- No backend: `mockGraphqlLink()` `Link.function`. Include `__typename` on the **Query root** (`Query`) **and** each item (`CatalogItem`). Missing root `__typename` crashes `fromJson`.
+- Repository: `@LazySingleton(as: IFooRepository)`, `traverseList` + mapper, `mapLeft((e) => e.toFailure())`.
+- GraphQL `ID` is `String`; entity `id` may be `int` — AutoMappr `Field.custom` (`CatalogItemGraphModelToEntityMapper.parseId`).
+- Errors: `BaseGraphError` + `GraphQlErrorType`; domain `*Failure`; `extension ... on BaseGraphError { BaseFailure toFailure() }` in `infrastructure/mappers`.

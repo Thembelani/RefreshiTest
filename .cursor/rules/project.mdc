@@ -1,0 +1,16 @@
+---
+description: SDK, dependency pins, codegen, and scope
+alwaysApply: true
+---
+
+# Refreshi project
+
+- Use **FVM Flutter 3.38.5 / Dart 3.10.4 only**. Never system Flutter or Dart 3.11+. Run tools as `fvm flutter` (`Makefile` `FLUTTER := fvm flutter`).
+- Pins that break this SDK:
+  - `auto_route: '>=11.1.0 <11.2.0'` (11.2.0 does not compile)
+  - `auto_mappr: '>=2.15.1 <2.16.0'` (2.16+ needs Dart 3.12)
+- Package `refreshi_test`, Android/iOS org `com.refreshi`.
+- Folders: `bootstrap`, `domain`, `application`, `infrastructure`, `presentation`, `shared`.
+- Do not add unasked features, extra screens, or rewrite unrelated code.
+- Generated files are gitignored (`*.g.dart`, `*.freezed.dart`, `*.gr.dart`, `*.graphql.dart`, `*.auto_mappr.dart`, `lib/get_it.config.dart`). Regenerate with `fvm flutter pub run build_runner build`.
+- `MaterialApp.router`: `theme: AppTheme.theme`, `debugShowCheckedModeBanner: false`.
