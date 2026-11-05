@@ -7,7 +7,7 @@ alwaysApply: true
 
 Leave these as they are until explicitly asked:
 
-- **Auth** is a 2s delayed stub in `AuthBloc`. No auth repository, no GraphQL login.
+- **Auth** `SignInUseCase` checks for a valid email and password `Test1234`. No auth repository, no GraphQL login. Successful sign-in and `signOut` still wait 2s in `AuthBloc`.
 - **Catalog quantities** live in `CatalogScreen` local state (`Map<String, int>`). Checkout is `context.router.push(const CheckoutRoute())` with **no cart args**.
 - **Checkout / Order Summary** still use `dummyCartLines()` and dummy address/card copy.
 - **`CartEntity` / `CartItemEntity` / `ICartRepository` / `ICartItemRepository` exist unused.** Do not add GraphQL, repos, blocs, or UI for them unless asked.

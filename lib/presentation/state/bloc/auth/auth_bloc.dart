@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:refreshi_test/application/use_cases/auth/sign_in_use_case.dart';
+import 'package:refreshi_test/domain/failures/base_failure.dart';
 import 'package:refreshi_test/presentation/state/utils/data_status.dart';
 
 part 'auth_event.dart';
@@ -9,7 +11,7 @@ part 'auth_bloc.freezed.dart';
 
 @lazySingleton
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(const AuthState()) {
+  AuthBloc(this._signInUseCase) : super(const AuthState()) {
     on<AuthEvent>((event, emit) async {
       await event.when(
         setEmail: (email) => _setEmail(emit, email),
@@ -19,6 +21,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
   }
+
+  final SignInUseCase _signInUseCase;
 
   Future<void> _setEmail(
     Emitter<AuthState> emit,
@@ -38,17 +42,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _signIn(
      Emitter<AuthState> emit
   ) async {
-    emit(state.copyWith(status: DataStatus.loading));
+    emit(state.copyWith(status: DataStatus.loading, failure: null));
+    final result = await _signInUseCase
+        .call(
+          SignInParams(
+            email: state.email ?? '',
+            password: state.password ?? '',
+          ),
+        )
+        .run();
+
+    final failure = result.fold<BaseFailure?>((value) => value, (_) => null);
+    if (failure != null) {
+      emit(state.copyWith(status: DataStatus.error, failure: failure));
+      return;
+    }
+
     await Future.delayed(const Duration(seconds: 2));
-    emit(state.copyWith( status: DataStatus.success));
+    emit(state.copyWith(status: DataStatus.success, failure: null));
   }
 
   Future<void> _signOut(
      Emitter<AuthState> emit
   ) async {
-    emit(state.copyWith(status: DataStatus.loading));
+    emit(state.copyWith(status: DataStatus.loading, failure: null));
     await Future.delayed(const Duration(seconds: 2));
-    emit(state.copyWith(status: DataStatus.success, email: null, password: null));
+    emit(state.copyWith(
+      status: DataStatus.success,
+      email: null,
+      password: null,
+      failure: null,
+    ));
   }
 }
 

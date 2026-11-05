@@ -1,4 +1,5 @@
 import 'package:mocktail/mocktail.dart';
+import 'package:refreshi_test/application/use_cases/auth/sign_in_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart/create_cart_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/create_cart_item_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/update_cart_item_use_case.dart';
@@ -12,6 +13,8 @@ import 'package:refreshi_test/infrastructure/datasources/graphql/clients/catalog
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/delivery_graph_client.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/delivery_time_graph_client.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/payment_graph_client.dart';
+
+class MockSignInUseCase extends Mock implements SignInUseCase {}
 
 class MockGetCatalogItemsUseCase extends Mock
     implements GetCatalogItemsUseCase {}

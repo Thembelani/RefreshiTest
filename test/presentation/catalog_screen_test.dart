@@ -17,6 +17,11 @@ void main() {
     await tester.pumpWidget(const RefreshiApp());
     await tester.pumpAndSettle();
 
+    await tester.enterText(find.byKey(const Key('login-email')), 'a@b.com');
+    await tester.enterText(
+      find.byKey(const Key('login-password')),
+      'Test1234',
+    );
     await tester.tap(find.widgetWithText(FilledButton, 'Log in'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 2));

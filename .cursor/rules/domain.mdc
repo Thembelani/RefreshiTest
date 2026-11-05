@@ -20,4 +20,4 @@ TaskEither<BaseFailure, CartEntity> updateCart(CartEntity entity);
 TaskEither<BaseFailure, Unit> deleteCart(int id);
 ```
 
-- Failures extend `BaseFailure` in `lib/domain/failures/`. Empty subclasses (no `==`); tests use `isA<GetCatalogItemFailure>()`.
+- Failures extend `BaseFailure` in `lib/domain/failures/`. Empty subclasses (no `==`); tests use `isA<GetCatalogItemFailure>()`. Auth: `InvalidEmailFailure` / `InvalidPasswordFailure`.

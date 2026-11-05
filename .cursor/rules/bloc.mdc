@@ -20,4 +20,4 @@ if (bloc.state.status == DataStatus.none) {
 ```
 
 - Navigate in `BlocListener` / `BlocConsumer` on the screen that should react. Use `listenWhen` so login success and sign-out success are not treated as the same.
-- Auth `signIn` / `signOut` currently `await Future.delayed(const Duration(seconds: 2))` then `DataStatus.success`. Keep that until a real auth use case is asked for.
+- Auth `signIn` calls `SignInUseCase` (valid email + password `Test1234`). On success, `await Future.delayed(const Duration(seconds: 2))` then `DataStatus.success`. `signOut` is still a 2s delayed stub.
