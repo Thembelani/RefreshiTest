@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
 import 'package:refreshi_test/domain/entities/cart_item.dart';
 import 'package:refreshi_test/domain/entities/catalog_item.dart';
-import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
+import 'package:refreshi_test/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/catalog_service.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 
@@ -39,7 +39,7 @@ List<CartLine> cartLinesFrom({
     if (catalog == null) {
       continue;
     }
-    final priceCents = (catalog.sellingPrice * 100).round();
+    final priceCents = sellingPriceToCents(catalog.sellingPrice);
     lines.add(
       CartLine(
         cartItemId: item.id,

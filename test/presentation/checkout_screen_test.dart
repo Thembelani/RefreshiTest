@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:refreshi_test/bootstrap/providers/global_provider.dart';
 import 'package:refreshi_test/bootstrap/theme/app_theme.dart';
 import 'package:refreshi_test/get_it.dart';
-import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
+import 'package:refreshi_test/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/checkout_screen.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';

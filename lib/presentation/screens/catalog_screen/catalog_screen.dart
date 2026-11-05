@@ -5,9 +5,9 @@ import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
 import 'package:refreshi_test/domain/entities/cart_item.dart';
 import 'package:refreshi_test/domain/entities/catalog_item.dart';
-import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/widgets/catalog_tile.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
+import 'package:refreshi_test/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
 import 'package:refreshi_test/presentation/state/utils/data_status.dart';
@@ -33,23 +33,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
     context.read<CartBloc>().add(const CartEvent.startCart());
   }
 
-  CatalogItem _toCatalogItem(CatalogItemEntity entity) {
-    return CatalogItem(
-      id: '${entity.id}',
-      name: entity.name,
-      priceCents: (entity.sellingPrice * 100).round(),
-      icon: Icons.coffee_outlined,
-    );
-  }
-
-  List<CatalogItem> _visibleItems(List<CatalogItemEntity> items) {
-    final catalogItems = items.map(_toCatalogItem).toList();
+  List<CatalogItemEntity> _visibleItems(List<CatalogItemEntity> items) {
     final query = _query.trim().toLowerCase();
     if (query.isEmpty) {
-      return catalogItems;
+      return items;
     }
 
-    return catalogItems
+    return items
         .where((item) => item.name.toLowerCase().contains(query))
         .toList();
   }
@@ -167,18 +157,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         itemCount: items.length,
                         itemBuilder: (context, index) {
                           final item = items[index];
-                          final catalogItemId = int.parse(item.id);
                           return CatalogTile(
                             item: item,
-                            quantity: cartState.quantityFor(catalogItemId),
+                            quantity: cartState.quantityFor(item.id),
                             onAdd: () => context.read<CartBloc>().add(
                                   CartEvent.addCatalogItem(
-                                    catalogItemId: catalogItemId,
+                                    catalogItemId: item.id,
                                   ),
                                 ),
                             onRemove: () => context.read<CartBloc>().add(
                                   CartEvent.decrementCatalogItem(
-                                    catalogItemId: catalogItemId,
+                                    catalogItemId: item.id,
                                   ),
                                 ),
                           );

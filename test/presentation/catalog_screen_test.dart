@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:refreshi_test/get_it.dart';
 import 'package:refreshi_test/main.dart';
-import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
+import 'package:refreshi_test/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/widgets/catalog_tile.dart';
 
 void main() {
