@@ -6,6 +6,7 @@ abstract class AuthState with _$AuthState {
     String? email,
     String? password,
     @Default(DataStatus.none) DataStatus status,
+    @Default(false) bool isLoggedIn,
     BaseFailure? failure,
   }) = _AuthState;
 }

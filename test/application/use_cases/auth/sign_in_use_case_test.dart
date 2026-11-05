@@ -12,7 +12,7 @@ void main() {
   test('succeeds for a valid email and password Test1234', () async {
     final result = await useCase
         .call(
-          const SignInParams(email: 'a@b.com', password: 'Test1234'),
+          const SignInParams(email: 'test@user.com', password: 'Test1234'),
         )
         .run();
 
@@ -22,7 +22,7 @@ void main() {
   test('fails for an invalid email', () async {
     final result = await useCase
         .call(
-          const SignInParams(email: 'not-an-email', password: 'Test1234'),
+          const SignInParams(email: 'a@b.com', password: 'Test1234'),
         )
         .run();
 
@@ -35,7 +35,7 @@ void main() {
   test('fails when password is not Test1234', () async {
     final result = await useCase
         .call(
-          const SignInParams(email: 'a@b.com', password: 'secret'),
+          const SignInParams(email: 'test@user.com', password: 'secret'),
         )
         .run();
 

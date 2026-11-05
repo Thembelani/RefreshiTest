@@ -19,15 +19,12 @@ class SignInParams extends Equatable {
 class SignInUseCase implements UseCase<Unit, SignInParams> {
   SignInUseCase();
 
-  static final _validEmail = RegExp(
-    r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$',
-  );
-
+  static const _validEmail = 'test@user.com';
   static const _validPassword = 'Test1234';
 
   @override
   TaskEither<BaseFailure, Unit> call(SignInParams params) {
-    if (!_validEmail.hasMatch(params.email)) {
+    if (params.email != _validEmail) {
       return TaskEither.left(InvalidEmailFailure());
     }
     if (params.password != _validPassword) {

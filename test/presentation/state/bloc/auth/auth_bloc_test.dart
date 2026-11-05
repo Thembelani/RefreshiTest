@@ -34,10 +34,10 @@ void main() {
   });
 
   test('setEmail updates email', () async {
-    bloc.add(const AuthEvent.setEmail(email: 'a@b.com'));
+    bloc.add(const AuthEvent.setEmail(email: 'test@user.com'));
     await pumpEventQueue();
 
-    expect(bloc.state, const AuthState(email: 'a@b.com'));
+    expect(bloc.state, const AuthState(email: 'test@user.com'));
   });
 
   test('setPassword updates password', () async {
@@ -55,7 +55,7 @@ void main() {
       final states = <AuthState>[];
       bloc.stream.listen(states.add);
 
-      bloc.add(const AuthEvent.setEmail(email: 'a@b.com'));
+      bloc.add(const AuthEvent.setEmail(email: 'test@user.com'));
       bloc.add(const AuthEvent.setPassword(email: 'Test1234'));
       async.flushMicrotasks();
 
@@ -64,7 +64,7 @@ void main() {
       expect(
         states.last,
         const AuthState(
-          email: 'a@b.com',
+          email: 'test@user.com',
           password: 'Test1234',
           status: DataStatus.loading,
         ),
@@ -74,9 +74,10 @@ void main() {
       expect(
         states.last,
         const AuthState(
-          email: 'a@b.com',
+          email: 'test@user.com',
           password: 'Test1234',
           status: DataStatus.success,
+          isLoggedIn: true,
         ),
       );
 
@@ -108,7 +109,7 @@ void main() {
       final states = <AuthState>[];
       bloc.stream.listen(states.add);
 
-      bloc.add(const AuthEvent.setEmail(email: 'a@b.com'));
+      bloc.add(const AuthEvent.setEmail(email: 'test@user.com'));
       bloc.add(const AuthEvent.setPassword(email: 'secret'));
       async.flushMicrotasks();
 
@@ -117,7 +118,7 @@ void main() {
       expect(
         states.last,
         const AuthState(
-          email: 'a@b.com',
+          email: 'test@user.com',
           password: 'secret',
           status: DataStatus.loading,
         ),

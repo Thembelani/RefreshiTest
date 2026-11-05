@@ -40,18 +40,6 @@ class LoginScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        toolbarHeight: 72,
-        titleSpacing: 24,
-        title: Image.asset(
-          'assets/images/logo.png',
-          key: const Key('login-logo'),
-          height: 32,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-        ),
-      ),
       body: Align(
         alignment: const Alignment(0, -0.4),
         child: ConstrainedBox(
@@ -71,6 +59,14 @@ class LoginScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Image.asset(
+                      'assets/images/logo.png',
+                      key: const Key('login-logo'),
+                      height: 32,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                    hSpacer24,
                     Text(
                       'Login',
                       textAlign: TextAlign.center,

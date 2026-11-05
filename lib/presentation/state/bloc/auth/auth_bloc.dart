@@ -17,31 +17,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         setEmail: (email) => _setEmail(emit, email),
         setPassword: (password) => _setPassword(emit, password),
         signIn: () => _signIn(emit),
-        signOut: () => _signOut(emit)
+        signOut: () => _signOut(emit),
       );
     });
   }
 
   final SignInUseCase _signInUseCase;
 
-  Future<void> _setEmail(
-    Emitter<AuthState> emit,
-    String? email,
-
-  ) async {
+  Future<void> _setEmail(Emitter<AuthState> emit, String? email) async {
     emit(state.copyWith(email: email));
   }
 
-  Future<void> _setPassword(
-    Emitter<AuthState> emit,
-    String? password,
-  ) async {
+  Future<void> _setPassword(Emitter<AuthState> emit, String? password) async {
     emit(state.copyWith(password: password));
   }
 
-  Future<void> _signIn(
-     Emitter<AuthState> emit
-  ) async {
+  Future<void> _signIn(Emitter<AuthState> emit) async {
     emit(state.copyWith(status: DataStatus.loading, failure: null));
     final result = await _signInUseCase
         .call(
@@ -59,20 +50,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
 
     await Future.delayed(const Duration(seconds: 2));
-    emit(state.copyWith(status: DataStatus.success, failure: null));
+    emit(
+      state.copyWith(
+        status: DataStatus.success,
+        failure: null,
+        isLoggedIn: true,
+      ),
+    );
   }
 
-  Future<void> _signOut(
-     Emitter<AuthState> emit
-  ) async {
+  Future<void> _signOut(Emitter<AuthState> emit) async {
     emit(state.copyWith(status: DataStatus.loading, failure: null));
     await Future.delayed(const Duration(seconds: 2));
-    emit(state.copyWith(
-      status: DataStatus.success,
-      email: null,
-      password: null,
-      failure: null,
-    ));
+    emit(
+      state.copyWith(
+        status: DataStatus.success,
+        email: null,
+        password: null,
+        failure: null,
+        isLoggedIn: false,
+      ),
+    );
   }
 }
-
