@@ -13,4 +13,6 @@ alwaysApply: false
 - Primary `FilledButton`: `minimumSize: const Size(230, 52)`, padding 32×16, `type.labelLarge`, `colors.primary` / `onPrimary`.
 - Money: `formatRand` / `sellingPriceToCents` in `lib/presentation/shared/format_rand.dart`. Domain `sellingPrice` is a `double` (rands).
 - Catalog grid uses `CatalogItemEntity` from the bloc. Tiles use `product_placeholder.png` on `colors.surface`.
+- Checkout delivery windows come from `DeliveryTimesBloc`. The user must select **one** time; Complete stays disabled until `delivery.deliveryTimeId` is set.
 - Keep widget `Key`s tests already use (`login-email`, `login-password`, `catalog-logo`, `cart-totals`, …).
+- **One widget per file.** `StatefulWidget` + `State` stay together. Extra widgets go in `part` files of the same library (`part 'foo.dart';` / `part of 'bar.dart';`), not stacked in the parent file and not made public just to split.
