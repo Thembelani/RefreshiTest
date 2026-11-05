@@ -7,7 +7,7 @@ alwaysApply: false
 # Domain
 
 - Entities are plain classes named `*Entity` (`CatalogItemEntity`, `CartEntity`, `CartItemEntity`, `DeliveryEntity`, `PaymentEntity`, `DeliveryTimeEntity`). Mutable fields, required named constructors, camelCase (`cartId`, not `cart_id`).
-- `CartItemEntity` has `id`, `cartId`, `catalogItemId`, `quantity`. `DeliveryEntity` and `PaymentEntity` link to a cart via `cartId`. `PaymentEntity` holds a saved-card `token`.
+- `CartItemEntity` has `id`, `cartId`, `catalogItemId`, `quantity`. `DeliveryEntity` and `PaymentEntity` link to a cart via `cartId`. `PaymentEntity` holds a saved-card `token`. A placed cart is the order: `placedAt` is set.
 - No Freezed, Flutter, GraphQL, or GetIt types in `lib/domain`.
 - Repository interfaces: `lib/domain/interfaces/repositories/i_*_repository.dart`, named `I*Repository`.
 - Methods return `TaskEither<BaseFailure, T>`. CRUD:

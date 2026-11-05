@@ -1,6 +1,7 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:refreshi_test/application/use_cases/auth/sign_in_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart/create_cart_use_case.dart';
+import 'package:refreshi_test/application/use_cases/cart/update_cart_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/create_cart_item_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/update_cart_item_use_case.dart';
 import 'package:refreshi_test/application/use_cases/catalog_item/get_catalog_items_use_case.dart';
@@ -23,6 +24,8 @@ class MockCatalogItemGraphClient extends Mock
     implements CatalogItemGraphClient {}
 
 class MockCreateCartUseCase extends Mock implements CreateCartUseCase {}
+
+class MockUpdateCartUseCase extends Mock implements UpdateCartUseCase {}
 
 class MockCreateCartItemUseCase extends Mock implements CreateCartItemUseCase {}
 

@@ -22,6 +22,10 @@ import 'cart_mapper.auto_mappr.dart';
         custom: CartGraphModelToEntityMapper.parseCreateUpdatedAt,
       ),
       Field.custom(
+        'placedAt',
+        custom: CartGraphModelToEntityMapper.parseCreatePlacedAt,
+      ),
+      Field.custom(
         'deletedAt',
         custom: CartGraphModelToEntityMapper.parseCreateDeletedAt,
       ),
@@ -37,6 +41,10 @@ import 'cart_mapper.auto_mappr.dart';
       Field.custom(
         'updatedAt',
         custom: CartGraphModelToEntityMapper.parseGetUpdatedAt,
+      ),
+      Field.custom(
+        'placedAt',
+        custom: CartGraphModelToEntityMapper.parseGetPlacedAt,
       ),
       Field.custom(
         'deletedAt',
@@ -56,6 +64,10 @@ import 'cart_mapper.auto_mappr.dart';
         custom: CartGraphModelToEntityMapper.parseListUpdatedAt,
       ),
       Field.custom(
+        'placedAt',
+        custom: CartGraphModelToEntityMapper.parseListPlacedAt,
+      ),
+      Field.custom(
         'deletedAt',
         custom: CartGraphModelToEntityMapper.parseListDeletedAt,
       ),
@@ -73,6 +85,10 @@ import 'cart_mapper.auto_mappr.dart';
         custom: CartGraphModelToEntityMapper.parseUpdateUpdatedAt,
       ),
       Field.custom(
+        'placedAt',
+        custom: CartGraphModelToEntityMapper.parseUpdatePlacedAt,
+      ),
+      Field.custom(
         'deletedAt',
         custom: CartGraphModelToEntityMapper.parseUpdateDeletedAt,
       ),
@@ -86,24 +102,30 @@ class CartGraphModelToEntityMapper extends $CartGraphModelToEntityMapper {
       DateTime.parse(model.createdAt);
   static DateTime parseCreateUpdatedAt(Mutation$CreateCart$createCart model) =>
       DateTime.parse(model.updatedAt);
+  static DateTime? parseCreatePlacedAt(Mutation$CreateCart$createCart model) =>
+      _parseOptionalDate(model.placedAt);
   static DateTime? parseCreateDeletedAt(Mutation$CreateCart$createCart model) =>
-      _parseDeletedAt(model.deletedAt);
+      _parseOptionalDate(model.deletedAt);
 
   static int parseGetId(Query$GetCart$getCart model) => int.parse(model.id);
   static DateTime parseGetCreatedAt(Query$GetCart$getCart model) =>
       DateTime.parse(model.createdAt);
   static DateTime parseGetUpdatedAt(Query$GetCart$getCart model) =>
       DateTime.parse(model.updatedAt);
+  static DateTime? parseGetPlacedAt(Query$GetCart$getCart model) =>
+      _parseOptionalDate(model.placedAt);
   static DateTime? parseGetDeletedAt(Query$GetCart$getCart model) =>
-      _parseDeletedAt(model.deletedAt);
+      _parseOptionalDate(model.deletedAt);
 
   static int parseListId(Query$GetCarts$getCarts model) => int.parse(model.id);
   static DateTime parseListCreatedAt(Query$GetCarts$getCarts model) =>
       DateTime.parse(model.createdAt);
   static DateTime parseListUpdatedAt(Query$GetCarts$getCarts model) =>
       DateTime.parse(model.updatedAt);
+  static DateTime? parseListPlacedAt(Query$GetCarts$getCarts model) =>
+      _parseOptionalDate(model.placedAt);
   static DateTime? parseListDeletedAt(Query$GetCarts$getCarts model) =>
-      _parseDeletedAt(model.deletedAt);
+      _parseOptionalDate(model.deletedAt);
 
   static int parseUpdateId(Mutation$UpdateCart$updateCart model) =>
       int.parse(model.id);
@@ -111,9 +133,11 @@ class CartGraphModelToEntityMapper extends $CartGraphModelToEntityMapper {
       DateTime.parse(model.createdAt);
   static DateTime parseUpdateUpdatedAt(Mutation$UpdateCart$updateCart model) =>
       DateTime.parse(model.updatedAt);
+  static DateTime? parseUpdatePlacedAt(Mutation$UpdateCart$updateCart model) =>
+      _parseOptionalDate(model.placedAt);
   static DateTime? parseUpdateDeletedAt(Mutation$UpdateCart$updateCart model) =>
-      _parseDeletedAt(model.deletedAt);
+      _parseOptionalDate(model.deletedAt);
 
-  static DateTime? _parseDeletedAt(String? value) =>
+  static DateTime? _parseOptionalDate(String? value) =>
       value == null ? null : DateTime.parse(value);
 }

@@ -71,7 +71,7 @@ class _CheckoutBody extends StatelessWidget {
         textStyle: type.labelLarge,
       ),
       onPressed: canComplete
-          ? () => context.router.push(const OrderSummaryRoute())
+          ? () => context.read<CartBloc>().add(const CartEvent.placeOrder())
           : null,
       child: const Text('Complete'),
     );

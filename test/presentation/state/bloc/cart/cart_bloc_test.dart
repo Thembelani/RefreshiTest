@@ -24,6 +24,7 @@ void main() {
   );
 
   late MockCreateCartUseCase createCart;
+  late MockUpdateCartUseCase updateCart;
   late MockCreateCartItemUseCase createCartItem;
   late MockUpdateCartItemUseCase updateCartItem;
   late MockCreateDeliveryUseCase createDelivery;
@@ -47,7 +48,6 @@ void main() {
     createdAt: now,
     updatedAt: now,
   );
-
   setUpAll(() {
     registerFallbackValue(cart);
     registerFallbackValue(cartItem);
@@ -57,6 +57,7 @@ void main() {
 
   setUp(() {
     createCart = MockCreateCartUseCase();
+    updateCart = MockUpdateCartUseCase();
     createCartItem = MockCreateCartItemUseCase();
     updateCartItem = MockUpdateCartItemUseCase();
     createDelivery = MockCreateDeliveryUseCase();
@@ -64,6 +65,18 @@ void main() {
     createPayment = MockCreatePaymentUseCase();
     when(() => createDelivery.call(any())).thenReturn(TaskEither.right(delivery));
     when(() => createPayment.call(any())).thenReturn(TaskEither.right(payment));
+    when(() => updateCart.call(any())).thenAnswer((invocation) {
+      final entity = invocation.positionalArguments.first as CartEntity;
+      return TaskEither.right(
+        CartEntity(
+          id: entity.id,
+          createdAt: entity.createdAt,
+          updatedAt: entity.updatedAt,
+          placedAt: entity.placedAt,
+          deletedAt: entity.deletedAt,
+        ),
+      );
+    });
     when(() => updateDelivery.call(any())).thenAnswer((invocation) {
       final entity = invocation.positionalArguments.first as DeliveryEntity;
       return TaskEither.right(
@@ -82,6 +95,7 @@ void main() {
     });
     bloc = CartBloc(
       createCart,
+      updateCart,
       createCartItem,
       updateCartItem,
       createDelivery,
@@ -175,6 +189,24 @@ void main() {
     expect(bloc.state.delivery?.street, '12 Long Street');
     expect(bloc.state.payment?.token, 'tok_visa_4242');
     expect(bloc.state.checkoutPrepared, isTrue);
+  });
+
+  test('placeOrder finalizes the cart', () async {
+    when(() => createCart.call(any())).thenReturn(TaskEither.right(cart));
+
+    bloc.add(const CartEvent.startCart());
+    await pumpEventQueue();
+    bloc.add(const CartEvent.ensureCheckoutDetails());
+    await pumpEventQueue();
+    bloc.add(const CartEvent.selectDeliveryTime(deliveryTimeId: 1));
+    await pumpEventQueue();
+    bloc.add(const CartEvent.placeOrder());
+    await pumpEventQueue();
+
+    expect(bloc.state.cart?.placedAt, isNotNull);
+    expect(bloc.state.cart?.deletedAt, isNull);
+    expect(bloc.state.isPlaced, isTrue);
+    verify(() => updateCart.call(any())).called(1);
   });
 
   test('startCart emits error on failure', () async {

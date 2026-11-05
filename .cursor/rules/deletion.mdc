@@ -1,0 +1,14 @@
+---
+description: Delete and soft-delete only when the user explicitly deletes
+alwaysApply: true
+---
+
+# Deletion
+
+Never delete or soft-delete (`deletedAt`) unless the user **explicitly** deletes that entity (`remove`, `deleteCart`, `deleteCartItem`, …).
+
+Do **not** set `deletedAt` to mean placed, completed, cancelled-in-spirit, hidden, or archived.
+
+**Only exception:** a `CartItemEntity` with `quantity == 0` at checkout (`prepareCheckout`) may set `deletedAt`. That is the sole implicit soft-delete.
+
+Checkout Complete finalizes the cart with `placedAt`, never `deletedAt`.

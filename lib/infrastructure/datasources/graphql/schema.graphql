@@ -13,7 +13,7 @@ type Query {
 
 type Mutation {
     createCart: Cart!
-    updateCart(id: ID!): Cart!
+    updateCart(id: ID!, placedAt: String): Cart!
     deleteCart(id: ID!): Boolean!
     createCartItem(cartId: ID!, catalogItemId: ID!, quantity: Int!): CartItem!
     updateCartItem(id: ID!, quantity: Int!, deletedAt: String): CartItem!
@@ -52,6 +52,7 @@ type Cart {
     id: ID!
     createdAt: String!
     updatedAt: String!
+    placedAt: String
     deletedAt: String
 }
 

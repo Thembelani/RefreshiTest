@@ -45,7 +45,12 @@ Map<String, dynamic> _dataFor(
     case 'GetCarts':
       return {'getCarts': store.getCarts()};
     case 'UpdateCart':
-      return {'updateCart': store.updateCart(variables['id'] as String)};
+      return {
+        'updateCart': store.updateCart(
+          id: variables['id'] as String,
+          placedAt: variables['placedAt'] as String?,
+        ),
+      };
     case 'DeleteCart':
       return {'deleteCart': store.deleteCart(variables['id'] as String)};
     case 'CreateCartItem':

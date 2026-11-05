@@ -97,8 +97,7 @@ void main() {
     await tester.tap(find.byType(DeliveryTimeCard).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Complete'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
 
     expect(find.text('Order Summary'), findsOneWidget);
     expect(find.byType(OrderSummaryScreen), findsOneWidget);

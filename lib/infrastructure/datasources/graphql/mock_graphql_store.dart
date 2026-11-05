@@ -37,6 +37,7 @@ class MockGraphqlStore {
       'id': id,
       'createdAt': now,
       'updatedAt': now,
+      'placedAt': null,
       'deletedAt': null,
       '__typename': 'Cart',
     };
@@ -48,12 +49,16 @@ class MockGraphqlStore {
 
   List<Map<String, dynamic>> getCarts() => carts.values.toList();
 
-  Map<String, dynamic>? updateCart(String id) {
+  Map<String, dynamic>? updateCart({
+    required String id,
+    String? placedAt,
+  }) {
     final cart = carts[id];
     if (cart == null) {
       return null;
     }
     cart['updatedAt'] = _now();
+    cart['placedAt'] = placedAt;
     return cart;
   }
 

@@ -57,33 +57,43 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return BlocListener<CartBloc, CartState>(
       listenWhen: (previous, current) =>
-          current.cart != null &&
-          (current.delivery == null || current.payment == null) &&
-          current.status != DataStatus.loading,
+          !previous.isPlaced && current.isPlaced,
       listener: (context, state) {
-        context.read<CartBloc>().add(const CartEvent.ensureCheckoutDetails());
+        context.router.push(const OrderSummaryRoute());
       },
-      child: BlocBuilder<CatalogItemsBloc, CatalogItemsState>(
-        builder: (context, catalogState) {
-          return BlocBuilder<DeliveryTimesBloc, DeliveryTimesState>(
-            builder: (context, timesState) {
-              return BlocBuilder<CartBloc, CartState>(
-                builder: (context, cartState) {
-                  return _CheckoutBody(
-                    stacked: stacked,
-                    items: cartState.items,
-                    catalogItems: catalogState.items,
-                    addressLines: _addressLines(cartState.delivery),
-                    deliveryTimes: timesState.items,
-                    selectedDeliveryTimeId: cartState.delivery?.deliveryTimeId,
-                    canComplete: cartState.items.active.isNotEmpty &&
-                        cartState.delivery?.deliveryTimeId != null,
-                  );
-                },
-              );
-            },
-          );
+      child: BlocListener<CartBloc, CartState>(
+        listenWhen: (previous, current) =>
+            current.cart != null &&
+            (current.delivery == null || current.payment == null) &&
+            current.status != DataStatus.loading,
+        listener: (context, state) {
+          context.read<CartBloc>().add(const CartEvent.ensureCheckoutDetails());
         },
+        child: BlocBuilder<CatalogItemsBloc, CatalogItemsState>(
+          builder: (context, catalogState) {
+            return BlocBuilder<DeliveryTimesBloc, DeliveryTimesState>(
+              builder: (context, timesState) {
+                return BlocBuilder<CartBloc, CartState>(
+                  builder: (context, cartState) {
+                    return _CheckoutBody(
+                      stacked: stacked,
+                      items: cartState.items,
+                      catalogItems: catalogState.items,
+                      addressLines: _addressLines(cartState.delivery),
+                      deliveryTimes: timesState.items,
+                      selectedDeliveryTimeId:
+                          cartState.delivery?.deliveryTimeId,
+                      canComplete: cartState.items.active.isNotEmpty &&
+                          cartState.delivery?.deliveryTimeId != null &&
+                          !cartState.isPlaced &&
+                          cartState.status != DataStatus.loading,
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

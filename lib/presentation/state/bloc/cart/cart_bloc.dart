@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:refreshi_test/application/use_cases/cart/create_cart_use_case.dart';
+import 'package:refreshi_test/application/use_cases/cart/update_cart_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/create_cart_item_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/update_cart_item_use_case.dart';
 import 'package:refreshi_test/application/use_cases/delivery/create_delivery_use_case.dart';
@@ -27,6 +28,7 @@ const _dummyPaymentToken = 'tok_visa_4242';
 class CartBloc extends Bloc<CartEvent, CartState> {
   CartBloc(
     this._createCartUseCase,
+    this._updateCartUseCase,
     this._createCartItemUseCase,
     this._updateCartItemUseCase,
     this._createDeliveryUseCase,
@@ -44,11 +46,13 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         ensureCheckoutDetails: () => _ensureCheckoutDetails(emit),
         selectDeliveryTime: (deliveryTimeId) =>
             _selectDeliveryTime(emit, deliveryTimeId),
+        placeOrder: () => _placeOrder(emit),
       );
     });
   }
 
   final CreateCartUseCase _createCartUseCase;
+  final UpdateCartUseCase _updateCartUseCase;
   final CreateCartItemUseCase _createCartItemUseCase;
   final UpdateCartItemUseCase _updateCartItemUseCase;
   final CreateDeliveryUseCase _createDeliveryUseCase;
@@ -418,6 +422,51 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       (updated) => emit(
         state.copyWith(
           items: _replaceItem(state.items, updated),
+          failure: null,
+          status: DataStatus.success,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _placeOrder(Emitter<CartState> emit) async {
+    final cart = state.cart;
+    if (cart == null ||
+        cart.placedAt != null ||
+        state.delivery?.deliveryTimeId == null) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        status: DataStatus.loading,
+        failure: null,
+      ),
+    );
+
+    final now = DateTime.now();
+    final result = await _updateCartUseCase
+        .call(
+          CartEntity(
+            id: cart.id,
+            createdAt: cart.createdAt,
+            updatedAt: now,
+            placedAt: now,
+            deletedAt: cart.deletedAt,
+          ),
+        )
+        .run();
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          failure: failure,
+          status: DataStatus.error,
+        ),
+      ),
+      (updated) => emit(
+        state.copyWith(
+          cart: updated,
           failure: null,
           status: DataStatus.success,
         ),

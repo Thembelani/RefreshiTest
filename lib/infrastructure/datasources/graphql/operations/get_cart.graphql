@@ -3,6 +3,7 @@ query GetCart($id: ID!) {
         id
         createdAt
         updatedAt
+        placedAt
         deletedAt
     }
 }

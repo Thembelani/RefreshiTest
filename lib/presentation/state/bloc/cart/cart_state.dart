@@ -14,6 +14,8 @@ abstract class CartState with _$CartState {
     @Default(false) bool checkoutPrepared,
   }) = _CartState;
 
+  bool get isPlaced => cart?.placedAt != null;
+
   List<CartItemEntity> get activeItems => items
       .where((item) => item.deletedAt == null && item.quantity > 0)
       .toList();

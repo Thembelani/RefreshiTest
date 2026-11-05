@@ -1,8 +1,9 @@
-mutation UpdateCart($id: ID!) {
-    updateCart(id: $id) {
+mutation UpdateCart($id: ID!, $placedAt: String) {
+    updateCart(id: $id, placedAt: $placedAt) {
         id
         createdAt
         updatedAt
+        placedAt
         deletedAt
     }
 }

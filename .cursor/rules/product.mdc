@@ -11,6 +11,6 @@ Leave these as they are until explicitly asked:
 - **Catalog quantities** live in `CatalogScreen` local state (`Map<String, int>`). Checkout is `context.router.push(const CheckoutRoute())` with **no cart args**.
 - **Checkout / Order Summary** still use `dummyCartLines()` and dummy address/card copy.
 - **`CartEntity` / `CartItemEntity` / `ICartRepository` / `ICartItemRepository` exist unused.** Do not add GraphQL, repos, blocs, or UI for them unless asked.
-- Catalog **Checkout** button is not a payment action. Checkout **Complete** only pushes `OrderSummaryRoute`. Order Summary **Done** calls `AuthEvent.signOut()`.
+- Catalog **Checkout** button is not a payment action. Checkout **Complete** finalizes the cart (`CartEvent.placeOrder` → `UpdateCartUseCase` sets `placedAt`) then pushes `OrderSummaryRoute`. No Order entity, no payment hold. Order Summary **Done** calls `AuthEvent.signOut()`.
 - Assets: `assets/images/logo.png`, `assets/images/product_placeholder.png`. Placeholder images are personal/non-commercial; do not swap in random stock.
 - Do not reintroduce a white catalog AppBar/scaffold override; use `AppTheme` colors.

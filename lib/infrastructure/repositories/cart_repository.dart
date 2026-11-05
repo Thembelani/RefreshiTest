@@ -71,7 +71,7 @@ class CartRepository implements ICartRepository {
   @override
   TaskEither<BaseFailure, CartEntity> updateCart(CartEntity entity) {
     return _client
-        .updateCart(entity.id)
+        .updateCart(entity)
         .flatMap(
           (model) => GraphModelMapper.mapUpdate<CartEntity,
               Mutation$UpdateCart$updateCart>(

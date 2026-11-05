@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
+import 'package:refreshi_test/domain/entities/cart.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/errors/base_graph_error.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/graphql_client.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/operations/create_cart.graphql.dart';
@@ -58,12 +59,15 @@ class CartGraphClient {
   }
 
   TaskEither<BaseGraphError, Mutation$UpdateCart$updateCart> updateCart(
-    int id,
+    CartEntity entity,
   ) {
     return TaskEither.tryCatch(
       () => _graphql.client.mutate$UpdateCart(
         Options$Mutation$UpdateCart(
-          variables: Variables$Mutation$UpdateCart(id: '$id'),
+          variables: Variables$Mutation$UpdateCart(
+            id: '${entity.id}',
+            placedAt: entity.placedAt?.toUtc().toIso8601String(),
+          ),
         ),
       ),
       (error, stackTrace) => BaseGraphError(

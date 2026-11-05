@@ -3,6 +3,7 @@ query GetCarts {
         id
         createdAt
         updatedAt
+        placedAt
         deletedAt
     }
 }
