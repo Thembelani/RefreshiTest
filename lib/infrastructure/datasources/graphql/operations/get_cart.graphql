@@ -1,0 +1,8 @@
+query GetCart($id: ID!) {
+    getCart(id: $id) {
+        id
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

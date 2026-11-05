@@ -1,0 +1,15 @@
+mutation CreateCartItem($cartId: ID!, $catalogItemId: ID!, $quantity: Int!) {
+    createCartItem(
+        cartId: $cartId
+        catalogItemId: $catalogItemId
+        quantity: $quantity
+    ) {
+        id
+        cartId
+        catalogItemId
+        quantity
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

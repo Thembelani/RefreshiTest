@@ -1,0 +1,11 @@
+query GetCartItems {
+    getCartItems {
+        id
+        cartId
+        catalogItemId
+        quantity
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

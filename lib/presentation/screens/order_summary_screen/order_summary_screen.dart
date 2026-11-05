@@ -7,6 +7,8 @@ import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.d
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 import 'package:refreshi_test/presentation/state/bloc/auth/auth_bloc.dart';
+import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
+import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
 import 'package:refreshi_test/presentation/state/utils/data_status.dart';
 
 const _paneGap = 12.0;
@@ -20,13 +22,13 @@ class OrderSummaryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.theme.appColors;
     final type = context.theme.appTypography;
-    final lines = dummyCartLines();
-    final totalCents = lines.fold(0, (total, line) {
-      final item = catalogItems.firstWhere(
-        (item) => item.id == line.service.id,
-      );
-      return total + item.priceCents * line.quantity;
-    });
+    final cartState = context.watch<CartBloc>().state;
+    final catalogState = context.watch<CatalogItemsBloc>().state;
+    final lines = cartLinesFrom(
+      items: cartState.items,
+      catalogItems: catalogState.items,
+    );
+    final totalCents = cartTotalCents(lines);
     final titleStyle = type.bodyMedium.copyWith(color: colors.onSurface);
     final valueStyle = type.bodyLarge.copyWith(color: colors.onBackground);
 

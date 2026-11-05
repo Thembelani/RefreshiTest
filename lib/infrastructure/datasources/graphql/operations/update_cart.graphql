@@ -1,0 +1,8 @@
+mutation UpdateCart($id: ID!) {
+    updateCart(id: $id) {
+        id
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

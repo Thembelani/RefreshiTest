@@ -1,0 +1,11 @@
+query GetCartItem($id: ID!) {
+    getCartItem(id: $id) {
+        id
+        cartId
+        catalogItemId
+        quantity
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

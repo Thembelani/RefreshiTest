@@ -3,5 +3,8 @@ query GetCatalogItems {
         id
         name
         sellingPrice
+        createdAt
+        updatedAt
+        deletedAt
     }
 }

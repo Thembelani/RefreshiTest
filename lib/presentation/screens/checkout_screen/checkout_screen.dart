@@ -1,39 +1,56 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/delivery_time_card.dart';
+import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
+import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
 
 const _paneGap = 12.0;
 const _screenInset = 24.0;
 const _stackBreakpoint = 900.0;
 
 @RoutePage()
-class CheckoutScreen extends StatefulWidget {
+class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
 
   @override
-  State<CheckoutScreen> createState() => _CheckoutScreenState();
+  Widget build(BuildContext context) {
+    final stacked = MediaQuery.sizeOf(context).width < _stackBreakpoint;
+
+    return BlocBuilder<CatalogItemsBloc, CatalogItemsState>(
+      builder: (context, catalogState) {
+        return BlocBuilder<CartBloc, CartState>(
+          builder: (context, cartState) {
+            final lines = cartLinesFrom(
+              items: cartState.items,
+              catalogItems: catalogState.items,
+            );
+            return _CheckoutBody(stacked: stacked, lines: lines);
+          },
+        );
+      },
+    );
+  }
 }
 
-class _CheckoutScreenState extends State<CheckoutScreen> {
-  late final List<CartLine> _lines = dummyCartLines();
+class _CheckoutBody extends StatelessWidget {
+  const _CheckoutBody({
+    required this.stacked,
+    required this.lines,
+  });
 
-  void _removeLine(CartLine line) {
-    setState(() {
-      _lines.removeWhere((item) => item.service.id == line.service.id);
-    });
-  }
+  final bool stacked;
+  final List<CartLine> lines;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.theme.appColors;
     final type = context.theme.appTypography;
-    final lines = _lines;
-    final stacked = MediaQuery.sizeOf(context).width < _stackBreakpoint;
 
     final address = CheckoutPane(
       key: const Key('checkout-left-top-start'),
@@ -59,7 +76,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final cart = CartPanel(
       lines: lines,
       expand: !stacked,
-      onRemove: _removeLine,
+      onRemove: (line) => context.read<CartBloc>().add(
+            CartEvent.removeCartItem(cartItemId: line.cartItemId),
+          ),
     );
 
     final completeButton = FilledButton(

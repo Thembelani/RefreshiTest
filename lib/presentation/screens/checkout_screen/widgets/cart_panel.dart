@@ -1,36 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
+import 'package:refreshi_test/domain/entities/cart_item.dart';
+import 'package:refreshi_test/domain/entities/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/catalog_service.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 
 class CartLine {
-  const CartLine({required this.service, required this.quantity});
+  const CartLine({
+    required this.cartItemId,
+    required this.service,
+    required this.quantity,
+    required this.priceCents,
+  });
 
+  final int cartItemId;
   final CatalogService service;
   final int quantity;
+  final int priceCents;
 }
 
-List<CartLine> dummyCartLines() {
-  return List<CartLine>.generate(15, (index) {
-    final item = catalogItems[index];
-    return CartLine(
-      service: CatalogService(
-        id: item.id,
-        name: item.name,
-        summary: item.priceLabel,
-        icon: item.icon,
+List<CartLine> cartLinesFrom({
+  required List<CartItemEntity> items,
+  required List<CatalogItemEntity> catalogItems,
+}) {
+  final lines = <CartLine>[];
+  for (final item in items) {
+    if (item.deletedAt != null || item.quantity <= 0) {
+      continue;
+    }
+    CatalogItemEntity? catalog;
+    for (final candidate in catalogItems) {
+      if (candidate.id == item.catalogItemId) {
+        catalog = candidate;
+        break;
+      }
+    }
+    if (catalog == null) {
+      continue;
+    }
+    final priceCents = (catalog.sellingPrice * 100).round();
+    lines.add(
+      CartLine(
+        cartItemId: item.id,
+        service: CatalogService(
+          id: '${catalog.id}',
+          name: catalog.name,
+          summary: formatRand(priceCents),
+          icon: Icons.coffee_outlined,
+        ),
+        quantity: item.quantity,
+        priceCents: priceCents,
       ),
-      quantity: (index % 3) + 1,
     );
-  });
+  }
+  return lines;
 }
 
 int cartTotalCents(List<CartLine> lines) {
-  return lines.fold(0, (total, line) {
-    final item = catalogItems.firstWhere((item) => item.id == line.service.id);
-    return total + item.priceCents * line.quantity;
-  });
+  return lines.fold(
+    0,
+    (total, line) => total + line.priceCents * line.quantity,
+  );
 }
 
 class CartPanel extends StatelessWidget {

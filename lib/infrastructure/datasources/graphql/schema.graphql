@@ -1,9 +1,42 @@
 type Query {
     getCatalogItems: [CatalogItem!]!
+    getCart(id: ID!): Cart
+    getCarts: [Cart!]!
+    getCartItem(id: ID!): CartItem
+    getCartItems: [CartItem!]!
+}
+
+type Mutation {
+    createCart: Cart!
+    updateCart(id: ID!): Cart!
+    deleteCart(id: ID!): Boolean!
+    createCartItem(cartId: ID!, catalogItemId: ID!, quantity: Int!): CartItem!
+    updateCartItem(id: ID!, quantity: Int!, deletedAt: String): CartItem!
+    deleteCartItem(id: ID!): Boolean!
 }
 
 type CatalogItem {
     id: ID!
     name: String!
     sellingPrice: Float!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
+
+type Cart {
+    id: ID!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
+
+type CartItem {
+    id: ID!
+    cartId: ID!
+    catalogItemId: ID!
+    quantity: Int!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
 }

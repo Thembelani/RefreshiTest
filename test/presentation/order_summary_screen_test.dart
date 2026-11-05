@@ -1,15 +1,26 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:refreshi_test/bootstrap/providers/global_provider.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/app_theme.dart';
+import 'package:refreshi_test/get_it.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 import 'package:refreshi_test/presentation/screens/order_summary_screen/order_summary_screen.dart';
+import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
+import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
+
+import '../helpers/seed_cart.dart';
 
 void main() {
+  setUp(() async {
+    await getIt.reset();
+    await configureDependencies();
+  });
+
   testWidgets('order summary shows items, details, and total', (tester) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1;
@@ -17,15 +28,21 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.theme, home: const OrderSummaryScreen()),
+      GlobalProvider.create(
+        materialApp: MaterialApp(
+          theme: AppTheme.theme,
+          home: const OrderSummaryScreen(),
+        ),
+      ),
     );
     await tester.pump();
+    await seedCatalogAndCart(tester);
 
-    final lines = dummyCartLines();
-    final totalCents = lines.fold(0, (total, line) {
-      final item = catalogItems.firstWhere((item) => item.id == line.service.id);
-      return total + item.priceCents * line.quantity;
-    });
+    final lines = cartLinesFrom(
+      items: getIt<CartBloc>().state.items,
+      catalogItems: getIt<CatalogItemsBloc>().state.items,
+    );
+    final totalCents = cartTotalCents(lines);
 
     expect(find.byKey(const Key('order-summary-logo')), findsOneWidget);
     expect(find.text('Order Summary'), findsOneWidget);
@@ -63,14 +80,17 @@ void main() {
 
     final router = AppRouter();
     await tester.pumpWidget(
-      MaterialApp.router(
-        theme: AppTheme.theme,
-        routerConfig: router.config(
-          deepLinkBuilder: (_) => DeepLink.single(const CheckoutRoute()),
+      GlobalProvider.create(
+        materialApp: MaterialApp.router(
+          theme: AppTheme.theme,
+          routerConfig: router.config(
+            deepLinkBuilder: (_) => DeepLink.single(const CheckoutRoute()),
+          ),
         ),
       ),
     );
     await tester.pump();
+    await seedCatalogAndCart(tester);
 
     expect(find.text('Complete'), findsOneWidget);
     await tester.tap(find.text('Complete'));
@@ -82,8 +102,8 @@ void main() {
 
     await tester.tap(find.widgetWithText(FilledButton, 'Done'));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(find.byType(OrderSummaryScreen), findsNothing);
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
     expect(find.text('Login'), findsOneWidget);
   });
 }

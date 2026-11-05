@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:refreshi_test/bootstrap/providers/global_provider.dart';
 import 'package:refreshi_test/bootstrap/theme/app_theme.dart';
+import 'package:refreshi_test/get_it.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/checkout_screen.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/delivery_time_card.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/service_card.dart';
+import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
+import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
+
+import '../helpers/seed_cart.dart';
 
 void main() {
-  testWidgets('checkout cart shows dummy items, scrolls, and can complete', (
+  setUp(() async {
+    await getIt.reset();
+    await configureDependencies();
+  });
+
+  testWidgets('checkout cart shows cart items, scrolls, and can complete', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1200, 800);
@@ -18,12 +29,21 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.theme, home: const CheckoutScreen()),
+      GlobalProvider.create(
+        materialApp: MaterialApp(
+          theme: AppTheme.theme,
+          home: const CheckoutScreen(),
+        ),
+      ),
     );
     await tester.pump();
+    await seedCatalogAndCart(tester);
 
-    final dummyLines = dummyCartLines();
-    expect(dummyLines, hasLength(15));
+    final lines = cartLinesFrom(
+      items: getIt<CartBloc>().state.items,
+      catalogItems: getIt<CatalogItemsBloc>().state.items,
+    );
+    expect(lines, isNotEmpty);
     expect(find.byKey(const Key('checkout-logo')), findsOneWidget);
     expect(find.text('Address'), findsOneWidget);
     expect(find.text('Card Details'), findsOneWidget);
@@ -118,7 +138,7 @@ void main() {
     expect(
       find.descendant(
         of: cart,
-        matching: find.text(dummyLines.first.service.name),
+        matching: find.text(lines.first.service.name),
       ),
       findsOneWidget,
     );
@@ -133,25 +153,25 @@ void main() {
     expect(
       find.descendant(
         of: firstCard,
-        matching: find.text(dummyLines.first.service.summary),
+        matching: find.text(lines.first.service.summary),
       ),
       findsOneWidget,
     );
     expect(
       find.descendant(
         of: firstCard,
-        matching: find.text('Qty ${dummyLines.first.quantity}'),
+        matching: find.text('Qty ${lines.first.quantity}'),
       ),
       findsOneWidget,
     );
     final removeFirst = find.byKey(
-      Key('cart-remove-${dummyLines.first.service.id}'),
+      Key('cart-remove-${lines.first.service.id}'),
     );
     final firstCardBox = tester.getRect(firstCard);
     final titleBox = tester.getRect(
       find.descendant(
         of: firstCard,
-        matching: find.text(dummyLines.first.service.name),
+        matching: find.text(lines.first.service.name),
       ),
     );
     final removeBox = tester.getRect(removeFirst);
@@ -174,7 +194,7 @@ void main() {
     expect(
       find.descendant(
         of: totals,
-        matching: find.text(formatRand(cartTotalCents(dummyLines))),
+        matching: find.text(formatRand(cartTotalCents(lines))),
       ),
       findsOneWidget,
     );
@@ -183,11 +203,11 @@ void main() {
     expect(totalsBox.top, greaterThan(cartBox.top));
 
     await tester.tap(removeFirst);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(
       find.descendant(
         of: cart,
-        matching: find.text(dummyLines.first.service.name),
+        matching: find.text(lines.first.service.name),
       ),
       findsNothing,
     );
@@ -195,7 +215,7 @@ void main() {
       find.descendant(
         of: totals,
         matching: find.text(
-          formatRand(cartTotalCents(dummyLines.skip(1).toList())),
+          formatRand(cartTotalCents(lines.skip(1).toList())),
         ),
       ),
       findsOneWidget,
@@ -204,7 +224,7 @@ void main() {
     await tester.scrollUntilVisible(
       find.descendant(
         of: cart,
-        matching: find.text(dummyLines.last.service.name),
+        matching: find.text(lines.last.service.name),
       ),
       200,
       scrollable: find.descendant(of: cart, matching: find.byType(Scrollable)),
@@ -213,12 +233,11 @@ void main() {
     expect(
       find.descendant(
         of: cart,
-        matching: find.text(dummyLines.last.service.name),
+        matching: find.text(lines.last.service.name),
       ),
       findsOneWidget,
     );
     expect(tester.getRect(totals).top, closeTo(totalsBox.top, 1));
-    expect(catalogItems.first.name, dummyLines.first.service.name);
   });
 
   testWidgets('checkout stacks panes on a narrow window', (tester) async {
@@ -228,7 +247,12 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.theme, home: const CheckoutScreen()),
+      GlobalProvider.create(
+        materialApp: MaterialApp(
+          theme: AppTheme.theme,
+          home: const CheckoutScreen(),
+        ),
+      ),
     );
     await tester.pump();
 

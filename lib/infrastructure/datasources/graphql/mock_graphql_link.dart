@@ -1,96 +1,78 @@
+import 'package:gql/ast.dart';
 import 'package:graphql/client.dart';
+import 'package:refreshi_test/infrastructure/datasources/graphql/mock_graphql_store.dart';
 
-Link mockGraphqlLink() {
+Link mockGraphqlLink(MockGraphqlStore store) {
   return Link.function((request, [forward]) {
+    final definition = _operationDefinition(request);
+    final name = request.operation.operationName ?? definition?.name?.value;
+    final isMutation = definition?.type == OperationType.mutation;
+    final variables = request.variables;
+
     return Stream.value(
       Response(
         response: const {},
-        data: const {
-          '__typename': 'Query',
-          'getCatalogItems': _catalogItems,
+        data: {
+          '__typename': isMutation ? 'Mutation' : 'Query',
+          ..._dataFor(store, name, variables),
         },
       ),
     );
   });
 }
 
-const _catalogItems = [
-  {
-    'id': '1',
-    'name': 'Berry Latte',
-    'sellingPrice': 45.5,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '2',
-    'name': 'River Cream',
-    'sellingPrice': 32.0,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '3',
-    'name': 'Spice Bite',
-    'sellingPrice': 18.0,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '4',
-    'name': 'Frost Soda',
-    'sellingPrice': 22.0,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '5',
-    'name': 'Golden Brew',
-    'sellingPrice': 38.5,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '6',
-    'name': 'Spice Tart',
-    'sellingPrice': 16.0,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '7',
-    'name': 'Ginger Slice',
-    'sellingPrice': 19.5,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '8',
-    'name': 'Velvet Malt',
-    'sellingPrice': 41.0,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '9',
-    'name': 'Orchard Tart',
-    'sellingPrice': 24.5,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '10',
-    'name': 'Ruby Roast',
-    'sellingPrice': 36.0,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '11',
-    'name': 'Cedar Pod',
-    'sellingPrice': 28.0,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '12',
-    'name': 'River Roast',
-    'sellingPrice': 33.5,
-    '__typename': 'CatalogItem',
-  },
-  {
-    'id': '13',
-    'name': 'Copper Draught',
-    'sellingPrice': 29.0,
-    '__typename': 'CatalogItem',
-  },
-];
+OperationDefinitionNode? _operationDefinition(Request request) {
+  for (final definition in request.operation.document.definitions) {
+    if (definition is OperationDefinitionNode) {
+      return definition;
+    }
+  }
+  return null;
+}
+
+Map<String, dynamic> _dataFor(
+  MockGraphqlStore store,
+  String? name,
+  Map<String, dynamic> variables,
+) {
+  switch (name) {
+    case 'GetCatalogItems':
+      return {'getCatalogItems': store.catalogItems};
+    case 'CreateCart':
+      return {'createCart': store.createCart()};
+    case 'GetCart':
+      return {'getCart': store.getCart(variables['id'] as String)};
+    case 'GetCarts':
+      return {'getCarts': store.getCarts()};
+    case 'UpdateCart':
+      return {'updateCart': store.updateCart(variables['id'] as String)};
+    case 'DeleteCart':
+      return {'deleteCart': store.deleteCart(variables['id'] as String)};
+    case 'CreateCartItem':
+      return {
+        'createCartItem': store.createCartItem(
+          cartId: variables['cartId'] as String,
+          catalogItemId: variables['catalogItemId'] as String,
+          quantity: variables['quantity'] as int,
+        ),
+      };
+    case 'GetCartItem':
+      return {'getCartItem': store.getCartItem(variables['id'] as String)};
+    case 'GetCartItems':
+      return {'getCartItems': store.getCartItems()};
+    case 'UpdateCartItem':
+      return {
+        'updateCartItem': store.updateCartItem(
+          id: variables['id'] as String,
+          quantity: variables['quantity'] as int,
+          deletedAt: variables['deletedAt'] as String?,
+        ),
+      };
+    case 'DeleteCartItem':
+      return {
+        'deleteCartItem': store.deleteCartItem(variables['id'] as String),
+      };
+    default:
+      return {'getCatalogItems': store.catalogItems};
+  }
+}

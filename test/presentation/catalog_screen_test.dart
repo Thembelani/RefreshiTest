@@ -4,13 +4,11 @@ import 'package:refreshi_test/get_it.dart';
 import 'package:refreshi_test/main.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/widgets/catalog_tile.dart';
-import 'package:refreshi_test/presentation/state/bloc/auth/auth_bloc.dart';
 
 void main() {
   setUp(() async {
-    if (!getIt.isRegistered<AuthBloc>()) {
-      await configureDependencies();
-    }
+    await getIt.reset();
+    await configureDependencies();
   });
 
   testWidgets('catalog search filters tiles and taps update the cart count', (
@@ -20,9 +18,10 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(FilledButton, 'Log in'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
 
-    expect(catalogItems, hasLength(100));
     expect(find.byType(TextField), findsOneWidget);
     expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
 
@@ -33,13 +32,20 @@ void main() {
     expect(logoBox.right, lessThan(searchBox.left));
     expect(searchBox.width, greaterThan(320));
     expect(cartBox.left, greaterThan(searchBox.right));
-    final firstName = catalogItems.first.name;
-    final lastName = catalogItems.last.name;
+    const firstName = 'Berry Latte';
+    const lastName = 'Copper Draught';
+    const firstPriceCents = 4550;
 
     expect(find.text(firstName), findsOneWidget);
-    expect(find.text(catalogItems.first.priceLabel), findsWidgets);
+    expect(find.text(formatRand(firstPriceCents)), findsWidgets);
     expect(find.text('Total: R0.00'), findsOneWidget);
     expect(find.text('Add to cart'), findsNothing);
+    expect(
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Checkout'))
+          .onPressed,
+      isNull,
+    );
     expect(
       find.descendant(of: find.byType(Badge), matching: find.text('1')),
       findsNothing,
@@ -56,9 +62,9 @@ void main() {
       matching: find.byIcon(Icons.add),
     );
     await tester.tap(addFirst);
-    await tester.pump();
+    await tester.pumpAndSettle();
     await tester.tap(addFirst);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(
       find.descendant(of: find.byType(Badge), matching: find.text('2')),
@@ -69,14 +75,14 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.text('Total: ${formatRand(catalogItems.first.priceCents * 2)}'),
+      find.text('Total: ${formatRand(firstPriceCents * 2)}'),
       findsOneWidget,
     );
 
     await tester.tap(
       find.descendant(of: firstTile, matching: find.byIcon(Icons.remove)),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(
       find.descendant(of: find.byType(Badge), matching: find.text('1')),
@@ -87,7 +93,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.text('Total: ${formatRand(catalogItems.first.priceCents)}'),
+      find.text('Total: ${formatRand(firstPriceCents)}'),
       findsOneWidget,
     );
 
@@ -124,6 +130,13 @@ void main() {
     expect(checkoutBox.width, greaterThanOrEqualTo(230));
     expect(checkoutBox.height, greaterThanOrEqualTo(52));
     expect(checkoutBox.right, greaterThan(searchBox.right));
+
+    expect(
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Checkout'))
+          .onPressed,
+      isNotNull,
+    );
 
     await tester.tap(find.text('Checkout'));
     await tester.pumpAndSettle();

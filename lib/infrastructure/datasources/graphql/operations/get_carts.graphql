@@ -1,0 +1,8 @@
+query GetCarts {
+    getCarts {
+        id
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

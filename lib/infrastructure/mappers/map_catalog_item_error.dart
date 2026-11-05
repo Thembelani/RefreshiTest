@@ -6,7 +6,11 @@ extension CatalogItemErrorExtension on BaseGraphError {
   BaseFailure toFailure() {
     return switch (type) {
       GraphQlErrorType.getCatalogItemError => GetCatalogItemFailure(),
-      GraphQlErrorType.getCatalogItemParseError => GetCatalogItemParseFailure()
+      GraphQlErrorType.getCatalogItemParseError => GetCatalogItemParseFailure(),
+      GraphQlErrorType.cartError => GetCatalogItemFailure(),
+      GraphQlErrorType.cartParseError => GetCatalogItemParseFailure(),
+      GraphQlErrorType.cartItemError => GetCatalogItemFailure(),
+      GraphQlErrorType.cartItemParseError => GetCatalogItemParseFailure(),
     };
   }
 }

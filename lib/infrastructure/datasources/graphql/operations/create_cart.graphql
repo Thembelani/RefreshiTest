@@ -1,0 +1,8 @@
+mutation CreateCart {
+    createCart {
+        id
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

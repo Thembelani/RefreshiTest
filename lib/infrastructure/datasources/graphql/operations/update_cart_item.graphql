@@ -1,0 +1,11 @@
+mutation UpdateCartItem($id: ID!, $quantity: Int!, $deletedAt: String) {
+    updateCartItem(id: $id, quantity: $quantity, deletedAt: $deletedAt) {
+        id
+        cartId
+        catalogItemId
+        quantity
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}
