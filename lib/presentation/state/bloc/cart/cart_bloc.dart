@@ -4,8 +4,13 @@ import 'package:injectable/injectable.dart';
 import 'package:refreshi_test/application/use_cases/cart/create_cart_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/create_cart_item_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/update_cart_item_use_case.dart';
+import 'package:refreshi_test/application/use_cases/delivery/create_delivery_use_case.dart';
+import 'package:refreshi_test/application/use_cases/delivery/update_delivery_use_case.dart';
+import 'package:refreshi_test/application/use_cases/payment/create_payment_use_case.dart';
 import 'package:refreshi_test/domain/entities/cart.dart';
 import 'package:refreshi_test/domain/entities/cart_item.dart';
+import 'package:refreshi_test/domain/entities/delivery.dart';
+import 'package:refreshi_test/domain/entities/payment.dart';
 import 'package:refreshi_test/domain/failures/base_failure.dart';
 import 'package:refreshi_test/presentation/state/utils/data_status.dart';
 
@@ -13,12 +18,20 @@ part 'cart_event.dart';
 part 'cart_state.dart';
 part 'cart_bloc.freezed.dart';
 
+const _dummyStreet = '12 Long Street';
+const _dummyCity = 'Cape Town';
+const _dummyPostalCode = '8001';
+const _dummyPaymentToken = 'tok_visa_4242';
+
 @lazySingleton
 class CartBloc extends Bloc<CartEvent, CartState> {
   CartBloc(
     this._createCartUseCase,
     this._createCartItemUseCase,
     this._updateCartItemUseCase,
+    this._createDeliveryUseCase,
+    this._updateDeliveryUseCase,
+    this._createPaymentUseCase,
   ) : super(const CartState()) {
     on<CartEvent>((event, emit) async {
       await event.when(
@@ -28,6 +41,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             _decrementCatalogItem(emit, catalogItemId),
         removeCartItem: (cartItemId) => _removeCartItem(emit, cartItemId),
         prepareCheckout: () => _prepareCheckout(emit),
+        ensureCheckoutDetails: () => _ensureCheckoutDetails(emit),
+        selectDeliveryTime: (deliveryTimeId) =>
+            _selectDeliveryTime(emit, deliveryTimeId),
       );
     });
   }
@@ -35,6 +51,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   final CreateCartUseCase _createCartUseCase;
   final CreateCartItemUseCase _createCartItemUseCase;
   final UpdateCartItemUseCase _updateCartItemUseCase;
+  final CreateDeliveryUseCase _createDeliveryUseCase;
+  final UpdateDeliveryUseCase _updateDeliveryUseCase;
+  final CreatePaymentUseCase _createPaymentUseCase;
 
   Future<void> _startCart(Emitter<CartState> emit) async {
     emit(
@@ -171,7 +190,152 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         items: items,
         failure: null,
         status: DataStatus.success,
+      ),
+    );
+
+    final ready = await _ensureCheckoutDetails(emit);
+    if (!ready) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        failure: null,
+        status: DataStatus.success,
         checkoutPrepared: true,
+      ),
+    );
+  }
+
+  Future<bool> _ensureCheckoutDetails(Emitter<CartState> emit) async {
+    final cart = state.cart;
+    if (cart == null) {
+      return false;
+    }
+    if (state.delivery != null && state.payment != null) {
+      return true;
+    }
+
+    emit(
+      state.copyWith(
+        status: DataStatus.loading,
+        checkoutPrepared: false,
+        failure: null,
+      ),
+    );
+
+    final now = DateTime.now();
+    var delivery = state.delivery;
+    var payment = state.payment;
+
+    if (delivery == null) {
+      final result = await _createDeliveryUseCase
+          .call(
+            DeliveryEntity(
+              id: 0,
+              cartId: cart.id,
+              street: _dummyStreet,
+              city: _dummyCity,
+              postalCode: _dummyPostalCode,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          )
+          .run();
+      final BaseFailure? failure = result.fold((error) => error, (_) => null);
+      if (failure != null) {
+        emit(
+          state.copyWith(
+            failure: failure,
+            status: DataStatus.error,
+            checkoutPrepared: false,
+          ),
+        );
+        return false;
+      }
+      delivery = result.fold((_) => delivery, (entity) => entity);
+    }
+
+    if (payment == null) {
+      final result = await _createPaymentUseCase
+          .call(
+            PaymentEntity(
+              id: 0,
+              cartId: cart.id,
+              token: _dummyPaymentToken,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          )
+          .run();
+      final BaseFailure? failure = result.fold((error) => error, (_) => null);
+      if (failure != null) {
+        emit(
+          state.copyWith(
+            delivery: delivery,
+            failure: failure,
+            status: DataStatus.error,
+            checkoutPrepared: false,
+          ),
+        );
+        return false;
+      }
+      payment = result.fold((_) => payment, (entity) => entity);
+    }
+
+    emit(
+      state.copyWith(
+        delivery: delivery,
+        payment: payment,
+        failure: null,
+        status: DataStatus.success,
+      ),
+    );
+    return true;
+  }
+
+  Future<void> _selectDeliveryTime(
+    Emitter<CartState> emit,
+    int deliveryTimeId,
+  ) async {
+    final delivery = state.delivery;
+    if (delivery == null) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        status: DataStatus.loading,
+        failure: null,
+      ),
+    );
+
+    final pending = DeliveryEntity(
+      id: delivery.id,
+      cartId: delivery.cartId,
+      street: delivery.street,
+      city: delivery.city,
+      postalCode: delivery.postalCode,
+      deliveryTimeId: deliveryTimeId,
+      createdAt: delivery.createdAt,
+      updatedAt: DateTime.now(),
+      deletedAt: delivery.deletedAt,
+    );
+
+    final result = await _updateDeliveryUseCase.call(pending).run();
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          failure: failure,
+          status: DataStatus.error,
+        ),
+      ),
+      (updated) => emit(
+        state.copyWith(
+          delivery: updated,
+          failure: null,
+          status: DataStatus.success,
+        ),
       ),
     );
   }

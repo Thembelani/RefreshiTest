@@ -6,6 +6,7 @@ import 'package:refreshi_test/get_it.dart';
 import 'package:refreshi_test/presentation/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/checkout_screen.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
+import 'package:refreshi_test/presentation/shared/view_model_extensions/cart_item_extension.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/delivery_time_card.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/service_card.dart';
@@ -39,11 +40,11 @@ void main() {
     await tester.pump();
     await seedCatalogAndCart(tester);
 
-    final lines = cartLinesFrom(
-      items: getIt<CartBloc>().state.items,
-      catalogItems: getIt<CatalogItemsBloc>().state.items,
-    );
-    expect(lines, isNotEmpty);
+    final cartItems = getIt<CartBloc>().state.items.active.toList();
+    final catalogItems = getIt<CatalogItemsBloc>().state.items;
+    final firstCatalog = cartItems.first.catalogItem(catalogItems)!;
+    final lastCatalog = cartItems.last.catalogItem(catalogItems)!;
+    expect(cartItems, isNotEmpty);
     expect(find.byKey(const Key('checkout-logo')), findsOneWidget);
     expect(find.text('Address'), findsOneWidget);
     expect(find.text('Card Details'), findsOneWidget);
@@ -98,7 +99,7 @@ void main() {
 
     final firstTimeCard = find.byType(DeliveryTimeCard).first;
     await tester.tap(firstTimeCard);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(
       find.descendant(
         of: firstTimeCard,
@@ -138,7 +139,7 @@ void main() {
     expect(
       find.descendant(
         of: cart,
-        matching: find.text(lines.first.service.name),
+        matching: find.text(firstCatalog.name),
       ),
       findsOneWidget,
     );
@@ -153,25 +154,25 @@ void main() {
     expect(
       find.descendant(
         of: firstCard,
-        matching: find.text(lines.first.service.summary),
+        matching: find.text(cartItems.first.summary(firstCatalog)),
       ),
       findsOneWidget,
     );
     expect(
       find.descendant(
         of: firstCard,
-        matching: find.text('Qty ${lines.first.quantity}'),
+        matching: find.text('Qty ${cartItems.first.quantity}'),
       ),
       findsOneWidget,
     );
     final removeFirst = find.byKey(
-      Key('cart-remove-${lines.first.service.id}'),
+      Key('cart-remove-${firstCatalog.id}'),
     );
     final firstCardBox = tester.getRect(firstCard);
     final titleBox = tester.getRect(
       find.descendant(
         of: firstCard,
-        matching: find.text(lines.first.service.name),
+        matching: find.text(firstCatalog.name),
       ),
     );
     final removeBox = tester.getRect(removeFirst);
@@ -194,7 +195,7 @@ void main() {
     expect(
       find.descendant(
         of: totals,
-        matching: find.text(formatRand(cartTotalCents(lines))),
+        matching: find.text(formatRand(cartItems.totalCents(catalogItems))),
       ),
       findsOneWidget,
     );
@@ -207,7 +208,7 @@ void main() {
     expect(
       find.descendant(
         of: cart,
-        matching: find.text(lines.first.service.name),
+        matching: find.text(firstCatalog.name),
       ),
       findsNothing,
     );
@@ -215,7 +216,7 @@ void main() {
       find.descendant(
         of: totals,
         matching: find.text(
-          formatRand(cartTotalCents(lines.skip(1).toList())),
+          formatRand(cartItems.skip(1).totalCents(catalogItems)),
         ),
       ),
       findsOneWidget,
@@ -224,7 +225,7 @@ void main() {
     await tester.scrollUntilVisible(
       find.descendant(
         of: cart,
-        matching: find.text(lines.last.service.name),
+        matching: find.text(lastCatalog.name),
       ),
       200,
       scrollable: find.descendant(of: cart, matching: find.byType(Scrollable)),
@@ -233,7 +234,7 @@ void main() {
     expect(
       find.descendant(
         of: cart,
-        matching: find.text(lines.last.service.name),
+        matching: find.text(lastCatalog.name),
       ),
       findsOneWidget,
     );

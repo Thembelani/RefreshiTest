@@ -11,6 +11,12 @@ extension CartErrorExtension on BaseGraphError {
       GraphQlErrorType.cartItemParseError => CartItemParseFailure(),
       GraphQlErrorType.getCatalogItemError => CartFailure(),
       GraphQlErrorType.getCatalogItemParseError => CartParseFailure(),
+      GraphQlErrorType.deliveryError => CartFailure(),
+      GraphQlErrorType.deliveryParseError => CartParseFailure(),
+      GraphQlErrorType.paymentError => CartFailure(),
+      GraphQlErrorType.paymentParseError => CartParseFailure(),
+      GraphQlErrorType.deliveryTimeError => CartFailure(),
+      GraphQlErrorType.deliveryTimeParseError => CartParseFailure(),
     };
   }
 }

@@ -72,6 +72,60 @@ Map<String, dynamic> _dataFor(
       return {
         'deleteCartItem': store.deleteCartItem(variables['id'] as String),
       };
+    case 'CreateDelivery':
+      return {
+        'createDelivery': store.createDelivery(
+          cartId: variables['cartId'] as String,
+          street: variables['street'] as String,
+          city: variables['city'] as String,
+          postalCode: variables['postalCode'] as String,
+          deliveryTimeId: variables['deliveryTimeId'] as String?,
+        ),
+      };
+    case 'GetDelivery':
+      return {'getDelivery': store.getDelivery(variables['id'] as String)};
+    case 'GetDeliveries':
+      return {'getDeliveries': store.getDeliveries()};
+    case 'UpdateDelivery':
+      return {
+        'updateDelivery': store.updateDelivery(
+          id: variables['id'] as String,
+          street: variables['street'] as String,
+          city: variables['city'] as String,
+          postalCode: variables['postalCode'] as String,
+          deliveryTimeId: variables['deliveryTimeId'] as String?,
+          deletedAt: variables['deletedAt'] as String?,
+        ),
+      };
+    case 'DeleteDelivery':
+      return {
+        'deleteDelivery': store.deleteDelivery(variables['id'] as String),
+      };
+    case 'CreatePayment':
+      return {
+        'createPayment': store.createPayment(
+          cartId: variables['cartId'] as String,
+          token: variables['token'] as String,
+        ),
+      };
+    case 'GetPayment':
+      return {'getPayment': store.getPayment(variables['id'] as String)};
+    case 'GetPayments':
+      return {'getPayments': store.getPayments()};
+    case 'UpdatePayment':
+      return {
+        'updatePayment': store.updatePayment(
+          id: variables['id'] as String,
+          token: variables['token'] as String,
+          deletedAt: variables['deletedAt'] as String?,
+        ),
+      };
+    case 'DeletePayment':
+      return {
+        'deletePayment': store.deletePayment(variables['id'] as String),
+      };
+    case 'GetDeliveryTimes':
+      return {'getDeliveryTimes': store.getDeliveryTimes()};
     default:
       return {'getCatalogItems': store.catalogItems};
   }

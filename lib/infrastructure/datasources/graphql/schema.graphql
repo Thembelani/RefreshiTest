@@ -4,6 +4,11 @@ type Query {
     getCarts: [Cart!]!
     getCartItem(id: ID!): CartItem
     getCartItems: [CartItem!]!
+    getDelivery(id: ID!): Delivery
+    getDeliveries: [Delivery!]!
+    getPayment(id: ID!): Payment
+    getPayments: [Payment!]!
+    getDeliveryTimes: [DeliveryTime!]!
 }
 
 type Mutation {
@@ -13,6 +18,25 @@ type Mutation {
     createCartItem(cartId: ID!, catalogItemId: ID!, quantity: Int!): CartItem!
     updateCartItem(id: ID!, quantity: Int!, deletedAt: String): CartItem!
     deleteCartItem(id: ID!): Boolean!
+    createDelivery(
+        cartId: ID!
+        street: String!
+        city: String!
+        postalCode: String!
+        deliveryTimeId: ID
+    ): Delivery!
+    updateDelivery(
+        id: ID!
+        street: String!
+        city: String!
+        postalCode: String!
+        deliveryTimeId: ID
+        deletedAt: String
+    ): Delivery!
+    deleteDelivery(id: ID!): Boolean!
+    createPayment(cartId: ID!, token: String!): Payment!
+    updatePayment(id: ID!, token: String!, deletedAt: String): Payment!
+    deletePayment(id: ID!): Boolean!
 }
 
 type CatalogItem {
@@ -36,6 +60,36 @@ type CartItem {
     cartId: ID!
     catalogItemId: ID!
     quantity: Int!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
+
+type Delivery {
+    id: ID!
+    cartId: ID!
+    street: String!
+    city: String!
+    postalCode: String!
+    deliveryTimeId: ID
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
+
+type Payment {
+    id: ID!
+    cartId: ID!
+    token: String!
+    createdAt: String!
+    updatedAt: String!
+    deletedAt: String
+}
+
+type DeliveryTime {
+    id: ID!
+    day: String!
+    time: String!
     createdAt: String!
     updatedAt: String!
     deletedAt: String

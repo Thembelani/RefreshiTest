@@ -1,0 +1,13 @@
+query GetDelivery($id: ID!) {
+    getDelivery(id: $id) {
+        id
+        cartId
+        street
+        city
+        postalCode
+        deliveryTimeId
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

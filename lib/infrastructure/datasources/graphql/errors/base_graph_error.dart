@@ -18,4 +18,10 @@ enum GraphQlErrorType {
   cartParseError,
   cartItemError,
   cartItemParseError,
+  deliveryError,
+  deliveryParseError,
+  paymentError,
+  paymentParseError,
+  deliveryTimeError,
+  deliveryTimeParseError,
 }

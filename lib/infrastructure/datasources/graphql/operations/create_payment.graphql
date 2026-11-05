@@ -1,0 +1,10 @@
+mutation CreatePayment($cartId: ID!, $token: String!) {
+    createPayment(cartId: $cartId, token: $token) {
+        id
+        cartId
+        token
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

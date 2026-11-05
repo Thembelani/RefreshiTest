@@ -1,0 +1,10 @@
+mutation UpdatePayment($id: ID!, $token: String!, $deletedAt: String) {
+    updatePayment(id: $id, token: $token, deletedAt: $deletedAt) {
+        id
+        cartId
+        token
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

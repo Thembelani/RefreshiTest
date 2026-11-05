@@ -3,6 +3,8 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:refreshi_test/domain/entities/cart.dart';
 import 'package:refreshi_test/domain/entities/cart_item.dart';
+import 'package:refreshi_test/domain/entities/delivery.dart';
+import 'package:refreshi_test/domain/entities/payment.dart';
 import 'package:refreshi_test/domain/failures/cart_failures.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/utils/data_status.dart';
@@ -24,18 +26,68 @@ void main() {
   late MockCreateCartUseCase createCart;
   late MockCreateCartItemUseCase createCartItem;
   late MockUpdateCartItemUseCase updateCartItem;
+  late MockCreateDeliveryUseCase createDelivery;
+  late MockUpdateDeliveryUseCase updateDelivery;
+  late MockCreatePaymentUseCase createPayment;
   late CartBloc bloc;
+
+  final delivery = DeliveryEntity(
+    id: 1,
+    cartId: 1,
+    street: '12 Long Street',
+    city: 'Cape Town',
+    postalCode: '8001',
+    createdAt: now,
+    updatedAt: now,
+  );
+  final payment = PaymentEntity(
+    id: 1,
+    cartId: 1,
+    token: 'tok_visa_4242',
+    createdAt: now,
+    updatedAt: now,
+  );
 
   setUpAll(() {
     registerFallbackValue(cart);
     registerFallbackValue(cartItem);
+    registerFallbackValue(delivery);
+    registerFallbackValue(payment);
   });
 
   setUp(() {
     createCart = MockCreateCartUseCase();
     createCartItem = MockCreateCartItemUseCase();
     updateCartItem = MockUpdateCartItemUseCase();
-    bloc = CartBloc(createCart, createCartItem, updateCartItem);
+    createDelivery = MockCreateDeliveryUseCase();
+    updateDelivery = MockUpdateDeliveryUseCase();
+    createPayment = MockCreatePaymentUseCase();
+    when(() => createDelivery.call(any())).thenReturn(TaskEither.right(delivery));
+    when(() => createPayment.call(any())).thenReturn(TaskEither.right(payment));
+    when(() => updateDelivery.call(any())).thenAnswer((invocation) {
+      final entity = invocation.positionalArguments.first as DeliveryEntity;
+      return TaskEither.right(
+        DeliveryEntity(
+          id: entity.id,
+          cartId: entity.cartId,
+          street: entity.street,
+          city: entity.city,
+          postalCode: entity.postalCode,
+          deliveryTimeId: entity.deliveryTimeId,
+          createdAt: entity.createdAt,
+          updatedAt: entity.updatedAt,
+          deletedAt: entity.deletedAt,
+        ),
+      );
+    });
+    bloc = CartBloc(
+      createCart,
+      createCartItem,
+      updateCartItem,
+      createDelivery,
+      updateDelivery,
+      createPayment,
+    );
   });
 
   tearDown(() async {
@@ -120,6 +172,8 @@ void main() {
     await pumpEventQueue();
 
     expect(bloc.state.items.first.deletedAt, isNotNull);
+    expect(bloc.state.delivery?.street, '12 Long Street');
+    expect(bloc.state.payment?.token, 'tok_visa_4242');
     expect(bloc.state.checkoutPrepared, isTrue);
   });
 

@@ -1,26 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
+import 'package:refreshi_test/domain/entities/delivery_time.dart';
 
-class DeliveryTimeSlot {
-  const DeliveryTimeSlot({required this.day, required this.time});
-
-  final String day;
-  final String time;
-}
-
-const _windowHours = <int>[9, 12, 15, 18];
-
-String _formatHour(int hour) {
-  final period = hour < 12 ? 'am' : 'pm';
-  final display = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-  return '$display:00 $period';
-}
-
-final deliveryTimeSlots = [
-  for (var day = 1; day <= 5; day++)
-    for (final hour in _windowHours)
-      DeliveryTimeSlot(day: '$day Dec', time: _formatHour(hour)),
-];
+part 'delivery_time_scroller.dart';
 
 class DeliveryTimeCard extends StatelessWidget {
   const DeliveryTimeCard({
@@ -30,7 +12,7 @@ class DeliveryTimeCard extends StatelessWidget {
     super.key,
   });
 
-  final DeliveryTimeSlot slot;
+  final DeliveryTimeEntity slot;
   final bool selected;
   final VoidCallback onTap;
 
@@ -90,49 +72,5 @@ class DeliveryTimeCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class DeliveryTimeScroller extends StatefulWidget {
-  const DeliveryTimeScroller({this.expand = true, super.key});
-
-  final bool expand;
-
-  @override
-  State<DeliveryTimeScroller> createState() => _DeliveryTimeScrollerState();
-}
-
-class _DeliveryTimeScrollerState extends State<DeliveryTimeScroller> {
-  static const _cardWidth = 148.0;
-  static const _gap = 12.0;
-  static const _stackedHeight = 104.0;
-
-  int? _selectedIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    final scroller = ListView.separated(
-      key: const Key('delivery-time-scroller'),
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.zero,
-      itemCount: deliveryTimeSlots.length,
-      separatorBuilder: (context, index) => const SizedBox(width: _gap),
-      itemBuilder: (context, index) {
-        return SizedBox(
-          width: _cardWidth,
-          child: DeliveryTimeCard(
-            slot: deliveryTimeSlots[index],
-            selected: _selectedIndex == index,
-            onTap: () => setState(() => _selectedIndex = index),
-          ),
-        );
-      },
-    );
-
-    if (widget.expand) {
-      return scroller;
-    }
-
-    return SizedBox(height: _stackedHeight, child: scroller);
   }
 }

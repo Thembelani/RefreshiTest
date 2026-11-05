@@ -11,6 +11,12 @@ extension CatalogItemErrorExtension on BaseGraphError {
       GraphQlErrorType.cartParseError => GetCatalogItemParseFailure(),
       GraphQlErrorType.cartItemError => GetCatalogItemFailure(),
       GraphQlErrorType.cartItemParseError => GetCatalogItemParseFailure(),
+      GraphQlErrorType.deliveryError => GetCatalogItemFailure(),
+      GraphQlErrorType.deliveryParseError => GetCatalogItemParseFailure(),
+      GraphQlErrorType.paymentError => GetCatalogItemFailure(),
+      GraphQlErrorType.paymentParseError => GetCatalogItemParseFailure(),
+      GraphQlErrorType.deliveryTimeError => GetCatalogItemFailure(),
+      GraphQlErrorType.deliveryTimeParseError => GetCatalogItemParseFailure(),
     };
   }
 }

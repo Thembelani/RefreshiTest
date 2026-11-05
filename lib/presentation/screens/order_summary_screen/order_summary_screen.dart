@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
-import 'package:refreshi_test/presentation/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
+import 'package:refreshi_test/presentation/shared/view_model_extensions/cart_item_extension.dart';
+import 'package:refreshi_test/presentation/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/state/bloc/auth/auth_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
@@ -24,11 +25,13 @@ class OrderSummaryScreen extends StatelessWidget {
     final type = context.theme.appTypography;
     final cartState = context.watch<CartBloc>().state;
     final catalogState = context.watch<CatalogItemsBloc>().state;
-    final lines = cartLinesFrom(
-      items: cartState.items,
-      catalogItems: catalogState.items,
-    );
-    final totalCents = cartTotalCents(lines);
+    final delivery = cartState.delivery;
+    final address = delivery == null
+        ? '12 Long Street, Cape Town, 8001'
+        : '${delivery.street}, ${delivery.city}, ${delivery.postalCode}';
+    final items = cartState.items.active.toList();
+    final catalogItems = catalogState.items;
+    final totalCents = items.totalCents(catalogItems);
     final titleStyle = type.bodyMedium.copyWith(color: colors.onSurface);
     final valueStyle = type.bodyLarge.copyWith(color: colors.onBackground);
 
@@ -86,7 +89,7 @@ class OrderSummaryScreen extends StatelessWidget {
                 },
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: [
-                  detailRow('Address', '12 Long Street, Cape Town, 8001'),
+                  detailRow('Address', address),
                   detailRow('Card', 'Visa ending 4242', last: true),
                 ],
               ),
@@ -97,11 +100,17 @@ class OrderSummaryScreen extends StatelessWidget {
                 title: 'Items',
                 child: ListView.separated(
                   padding: EdgeInsets.zero,
-                  itemCount: lines.length,
+                  itemCount: items.length,
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 12),
-                  itemBuilder: (context, index) =>
-                      CartItemCard(line: lines[index]),
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    final catalog = item.catalogItem(catalogItems);
+                    if (catalog == null) {
+                      return const SizedBox.shrink();
+                    }
+                    return CartItemCard(item: item, catalog: catalog);
+                  },
                 ),
               ),
             ),

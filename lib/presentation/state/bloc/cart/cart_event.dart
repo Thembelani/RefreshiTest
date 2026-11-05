@@ -10,4 +10,7 @@ sealed class CartEvent with _$CartEvent {
   const factory CartEvent.removeCartItem({required int cartItemId}) =
       RemoveCartItem;
   const factory CartEvent.prepareCheckout() = PrepareCheckout;
+  const factory CartEvent.ensureCheckoutDetails() = EnsureCheckoutDetails;
+  const factory CartEvent.selectDeliveryTime({required int deliveryTimeId}) =
+      SelectDeliveryTime;
 }

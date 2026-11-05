@@ -1,0 +1,10 @@
+query GetPayment($id: ID!) {
+    getPayment(id: $id) {
+        id
+        cartId
+        token
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

@@ -1,0 +1,10 @@
+query GetPayments {
+    getPayments {
+        id
+        cartId
+        token
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

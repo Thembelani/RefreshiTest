@@ -1,0 +1,27 @@
+mutation UpdateDelivery(
+    $id: ID!
+    $street: String!
+    $city: String!
+    $postalCode: String!
+    $deliveryTimeId: ID
+    $deletedAt: String
+) {
+    updateDelivery(
+        id: $id
+        street: $street
+        city: $city
+        postalCode: $postalCode
+        deliveryTimeId: $deliveryTimeId
+        deletedAt: $deletedAt
+    ) {
+        id
+        cartId
+        street
+        city
+        postalCode
+        deliveryTimeId
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

@@ -22,5 +22,6 @@ Future<void> seedCatalogAndCart(
       await tester.pump();
     }
   }
+  getIt<CartBloc>().add(const CartEvent.ensureCheckoutDetails());
   await tester.pumpAndSettle();
 }

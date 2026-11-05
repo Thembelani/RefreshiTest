@@ -6,6 +6,8 @@ abstract class CartState with _$CartState {
 
   const factory CartState({
     CartEntity? cart,
+    DeliveryEntity? delivery,
+    PaymentEntity? payment,
     @Default([]) List<CartItemEntity> items,
     @Default(DataStatus.none) DataStatus status,
     BaseFailure? failure,

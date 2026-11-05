@@ -6,7 +6,7 @@ import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.d
 import 'package:refreshi_test/domain/entities/cart_item.dart';
 import 'package:refreshi_test/domain/entities/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/widgets/catalog_tile.dart';
-import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
+import 'package:refreshi_test/presentation/shared/view_model_extensions/cart_item_extension.dart';
 import 'package:refreshi_test/presentation/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
@@ -242,8 +242,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
     List<CartItemEntity> cartItems,
     List<CatalogItemEntity> catalogItems,
   ) {
-    return cartTotalCents(
-      cartLinesFrom(items: cartItems, catalogItems: catalogItems),
-    );
+    return cartItems.totalCents(catalogItems);
   }
 }

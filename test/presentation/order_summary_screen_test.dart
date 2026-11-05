@@ -7,8 +7,9 @@ import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/app_theme.dart';
 import 'package:refreshi_test/get_it.dart';
 import 'package:refreshi_test/presentation/shared/format_rand.dart';
-import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
+import 'package:refreshi_test/presentation/shared/view_model_extensions/cart_item_extension.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
+import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/delivery_time_card.dart';
 import 'package:refreshi_test/presentation/screens/order_summary_screen/order_summary_screen.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
@@ -38,11 +39,11 @@ void main() {
     await tester.pump();
     await seedCatalogAndCart(tester);
 
-    final lines = cartLinesFrom(
-      items: getIt<CartBloc>().state.items,
-      catalogItems: getIt<CatalogItemsBloc>().state.items,
-    );
-    final totalCents = cartTotalCents(lines);
+    final cartItems = getIt<CartBloc>().state.items.active.toList();
+    final catalogItems = getIt<CatalogItemsBloc>().state.items;
+    final firstCatalog = cartItems.first.catalogItem(catalogItems)!;
+    final lastCatalog = cartItems.last.catalogItem(catalogItems)!;
+    final totalCents = cartItems.totalCents(catalogItems);
 
     expect(find.byKey(const Key('order-summary-logo')), findsOneWidget);
     expect(find.text('Order Summary'), findsOneWidget);
@@ -52,7 +53,7 @@ void main() {
     expect(find.text('12 Long Street, Cape Town, 8001'), findsOneWidget);
     expect(find.text('Card'), findsOneWidget);
     expect(find.text('Visa ending 4242'), findsOneWidget);
-    expect(find.text(lines.first.service.name), findsOneWidget);
+    expect(find.text(firstCatalog.name), findsOneWidget);
     expect(find.text('Total: ${formatRand(totalCents)}'), findsOneWidget);
     expect(find.text('Done'), findsOneWidget);
     final done = find.widgetWithText(FilledButton, 'Done');
@@ -62,14 +63,14 @@ void main() {
     expect(doneBox.height, greaterThanOrEqualTo(52));
 
     await tester.scrollUntilVisible(
-      find.text(lines.last.service.name),
+      find.text(lastCatalog.name),
       200,
       scrollable: find.descendant(
         of: find.byType(CheckoutPane).last,
         matching: find.byType(Scrollable),
       ),
     );
-    expect(find.text(lines.last.service.name), findsOneWidget);
+    expect(find.text(lastCatalog.name), findsOneWidget);
   });
 
   testWidgets('complete on checkout opens order summary', (tester) async {
@@ -93,6 +94,8 @@ void main() {
     await seedCatalogAndCart(tester);
 
     expect(find.text('Complete'), findsOneWidget);
+    await tester.tap(find.byType(DeliveryTimeCard).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Complete'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));

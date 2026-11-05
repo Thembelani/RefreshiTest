@@ -1,0 +1,25 @@
+mutation CreateDelivery(
+    $cartId: ID!
+    $street: String!
+    $city: String!
+    $postalCode: String!
+    $deliveryTimeId: ID
+) {
+    createDelivery(
+        cartId: $cartId
+        street: $street
+        city: $city
+        postalCode: $postalCode
+        deliveryTimeId: $deliveryTimeId
+    ) {
+        id
+        cartId
+        street
+        city
+        postalCode
+        deliveryTimeId
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

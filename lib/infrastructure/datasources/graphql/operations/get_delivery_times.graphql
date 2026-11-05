@@ -1,0 +1,10 @@
+query GetDeliveryTimes {
+    getDeliveryTimes {
+        id
+        day
+        time
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}

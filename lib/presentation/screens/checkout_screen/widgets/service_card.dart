@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
-import 'package:refreshi_test/presentation/screens/checkout_screen/catalog_service.dart';
+import 'package:refreshi_test/domain/entities/catalog_item.dart';
+import 'package:refreshi_test/presentation/shared/format_rand.dart';
 
 class ServiceCard extends StatelessWidget {
   const ServiceCard({
-    required this.service,
+    required this.item,
     required this.onTap,
     super.key,
   });
 
-  final CatalogService service;
+  final CatalogItemEntity item;
   final VoidCallback onTap;
 
   @override
@@ -37,7 +38,7 @@ class ServiceCard extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Icon(service.icon, color: colors.primary),
+                  child: Icon(Icons.coffee_outlined, color: colors.primary),
                 ),
               ),
               const SizedBox(width: 16),
@@ -46,14 +47,14 @@ class ServiceCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      service.name,
+                      item.name,
                       style: type.titleMedium.copyWith(
                         color: colors.onBackground,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      service.summary,
+                      formatRand(sellingPriceToCents(item.sellingPrice)),
                       style: type.bodyMedium.copyWith(color: colors.onSurface),
                     ),
                   ],
