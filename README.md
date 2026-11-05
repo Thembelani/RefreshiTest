@@ -1,16 +1,32 @@
-# refreshi_test
+# Refreshi
 
-A new Flutter project.
+Web-first Flutter checkout slice (catalog → checkout → order summary). Architecture and assignment notes are in [SOLUTION.md](SOLUTION.md).
 
-## Getting Started
+## Run
 
-This project is a starting point for a Flutter application.
+Use **FVM Flutter 3.38.5 / Dart 3.10.4** only (`fvm flutter`). Generated files are gitignored, so run code generation after `pub get`.
 
-A few resources to get you started if this is your first Flutter project:
+```sh
+fvm flutter pub get
+fvm flutter pub run build_runner build
+fvm flutter run -d chrome
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+iOS / Android from the same codebase:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```sh
+fvm flutter run
+```
+
+Makefile equivalents: `make install`, `make build`, `make run-debug`.
+
+### Sign-in
+
+- Email: `test@user.com`
+- Password: `Test1234`
+
+### Tests
+
+```sh
+fvm flutter test
+```
