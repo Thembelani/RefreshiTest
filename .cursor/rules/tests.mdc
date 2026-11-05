@@ -11,5 +11,5 @@ alwaysApply: false
 - Widget tests using `RefreshiApp` / screens with blocs: `await getIt.reset(); await configureDependencies();` in `setUp`. Wrap isolated screens with `GlobalProvider.create`.
 - Never `BlocProvider(create: (_) => getIt<AuthBloc>())` — that closes the singleton. Use `.value`.
 - Repository tests mock the Graph client; use the real AutoMappr mapper. Assert `isA<GetCatalogItemFailure>()` (`BaseFailure` has no `==`).
-- Catalog UI uses **mock GraphQL names/prices** (Berry Latte, Copper Draught, 4550 cents), not the generated `catalogItems` dummy list.
+- Catalog UI uses **mock GraphQL names/prices** (Berry Latte, Copper Draught, 4550 cents).
 - Prefer existing `Key`s (`login-email`, `catalog-logo`, …) over brittle text-only finders where both exist.

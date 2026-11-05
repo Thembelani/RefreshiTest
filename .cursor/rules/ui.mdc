@@ -11,6 +11,6 @@ alwaysApply: false
 - AppBar: `centerTitle: false`, `toolbarHeight: 72`, `titleSpacing: 24`, logo `Image.asset(..., height: 32)` with keys `login-logo` / `catalog-logo` / `order-summary-logo`. Do not paint a white AppBar override.
 - Catalog search is **60% of the AppBar title slot** (`constraints.maxWidth * 0.6`). Hint: `Search services`.
 - Primary `FilledButton`: `minimumSize: const Size(230, 52)`, padding 32×16, `type.labelLarge`, `colors.primary` / `onPrimary`.
-- Money: `formatRand(priceCents)` → `R12.50`. Domain `sellingPrice` is a `double` (rands); UI `CatalogItem.priceCents = (sellingPrice * 100).round()`.
-- Catalog grid maps **bloc entities**, not the leftover `catalogItems` dummy list in `catalog_item.dart`. Tiles use `product_placeholder.png` on `colors.surface`.
+- Money: `formatRand` / `sellingPriceToCents` in `lib/shared/format_rand.dart`. Domain `sellingPrice` is a `double` (rands).
+- Catalog grid uses `CatalogItemEntity` from the bloc. Tiles use `product_placeholder.png` on `colors.surface`.
 - Keep widget `Key`s tests already use (`login-email`, `login-password`, `catalog-logo`, `cart-totals`, …).
