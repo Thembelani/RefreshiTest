@@ -14,5 +14,5 @@ Screen → Bloc → UseCase → IRepository → Repository + GraphClient + AutoM
 - Blocs depend on **use cases**, not repositories or GraphQL clients.
 - GraphQL generated types stay in `infrastructure`. Map to `*Entity` in the repository via `GraphModelMapper` (`lib/infrastructure/shared/map_graph_model.dart`).
 - UI view models (`CartLine`, `CatalogService`) stay in `presentation`. Catalog tiles use `CatalogItemEntity` directly. Do not put Flutter types (`IconData`, `Color`) in `domain`.
-- `bootstrap` = app wiring (router, theme, `GlobalProvider`). `lib/shared` = app-wide helpers. `lib/infrastructure/shared` = GraphQL mapping helpers (`GraphModelMapper`).
+- `bootstrap` = app wiring (router, theme, `GlobalProvider`). UI helpers (`formatRand`) stay in `presentation/shared`. `lib/infrastructure/shared` = GraphQL mapping helpers (`GraphModelMapper`).
 - Failures: domain `BaseFailure` subclasses. GraphQL: `BaseGraphError` + `toFailure()` in `infrastructure/mappers`.

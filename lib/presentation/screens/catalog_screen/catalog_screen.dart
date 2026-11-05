@@ -7,7 +7,7 @@ import 'package:refreshi_test/domain/entities/cart_item.dart';
 import 'package:refreshi_test/domain/entities/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/widgets/catalog_tile.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
-import 'package:refreshi_test/shared/format_rand.dart';
+import 'package:refreshi_test/presentation/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
 import 'package:refreshi_test/presentation/state/utils/data_status.dart';

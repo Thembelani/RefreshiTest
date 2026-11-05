@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:refreshi_test/bootstrap/theme/app_palette/app_colors_extension.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
 import 'package:refreshi_test/domain/entities/catalog_item.dart';
-import 'package:refreshi_test/shared/format_rand.dart';
+import 'package:refreshi_test/presentation/shared/format_rand.dart';
 
 class CatalogTile extends StatelessWidget {
   const CatalogTile({

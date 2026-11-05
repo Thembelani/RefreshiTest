@@ -6,7 +6,7 @@ import 'package:refreshi_test/bootstrap/router/app_router.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/app_theme.dart';
 import 'package:refreshi_test/get_it.dart';
-import 'package:refreshi_test/shared/format_rand.dart';
+import 'package:refreshi_test/presentation/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
 import 'package:refreshi_test/presentation/screens/order_summary_screen/order_summary_screen.dart';
