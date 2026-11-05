@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
+import 'package:refreshi_test/bootstrap/theme/app_palette/app_colors_extension.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
@@ -11,13 +12,52 @@ import 'package:refreshi_test/presentation/state/bloc/auth/auth_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
 import 'package:refreshi_test/presentation/state/utils/data_status.dart';
+import 'package:refreshi_test/presentation/widgets/spacing/padding_constants.dart';
+import 'package:refreshi_test/presentation/widgets/spacing/radius_constants.dart';
+import 'package:refreshi_test/presentation/widgets/spacing/spacer_constants.dart';
 
-const _paneGap = 12.0;
-const _screenInset = 24.0;
+part 'hold_loading_overlay.dart';
+part 'hold_status.dart';
+part 'hold_timeline.dart';
+part 'order_details.dart';
+part 'order_id.dart';
+
+const _months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+String _formatOrderDate(DateTime date) {
+  final local = date.toLocal();
+  final hour = local.hour.toString().padLeft(2, '0');
+  final minute = local.minute.toString().padLeft(2, '0');
+  return '${local.day} ${_months[local.month - 1]} ${local.year}, $hour:$minute';
+}
 
 @RoutePage()
-class OrderSummaryScreen extends StatelessWidget {
+class OrderSummaryScreen extends StatefulWidget {
   const OrderSummaryScreen({super.key});
+
+  @override
+  State<OrderSummaryScreen> createState() => _OrderSummaryScreenState();
+}
+
+class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<CartBloc>().add(const CartEvent.fulfillPayment());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +65,8 @@ class OrderSummaryScreen extends StatelessWidget {
     final type = context.theme.appTypography;
     final cartState = context.watch<CartBloc>().state;
     final catalogState = context.watch<CatalogItemsBloc>().state;
+    final cart = cartState.cart;
+    final payment = cartState.payment;
     final delivery = cartState.delivery;
     final address = delivery == null
         ? '12 Long Street, Cape Town, 8001'
@@ -32,138 +74,133 @@ class OrderSummaryScreen extends StatelessWidget {
     final items = cartState.items.active.toList();
     final catalogItems = catalogState.items;
     final totalCents = items.totalCents(catalogItems);
-    final titleStyle = type.bodyMedium.copyWith(color: colors.onSurface);
-    final valueStyle = type.bodyLarge.copyWith(color: colors.onBackground);
+    final waitingForHold = cartState.isPlaced && !cartState.isFulfilled;
 
-    TableRow detailRow(String title, String value, {bool last = false}) {
-      final padding = EdgeInsets.only(bottom: last ? 0 : 12);
-      return TableRow(
-        children: [
-          Padding(
-            padding: padding.copyWith(right: 16),
-            child: Text(title, style: titleStyle),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            centerTitle: false,
+            toolbarHeight: 72,
+            titleSpacing: 24,
+            title: Image.asset(
+              'assets/images/logo.png',
+              key: const Key('order-summary-logo'),
+              height: 32,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
+            ),
           ),
-          Padding(
-            padding: padding,
-            child: Text(value, style: valueStyle),
-          ),
-        ],
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        toolbarHeight: 72,
-        titleSpacing: 24,
-        title: Image.asset(
-          'assets/images/logo.png',
-          key: const Key('order-summary-logo'),
-          height: 32,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          _screenInset,
-          _screenInset,
-          _screenInset,
-          0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Order Summary',
-              style: type.headlineSmall.copyWith(color: colors.onBackground),
-            ),
-            const SizedBox(height: 16),
-            CheckoutPane(
-              title: 'Details',
-              expand: false,
-              child: Table(
-                columnWidths: const {
-                  0: IntrinsicColumnWidth(),
-                  1: FlexColumnWidth(),
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: [
-                  detailRow('Address', address),
-                  detailRow('Card', 'Visa ending 4242', last: true),
-                ],
-              ),
-            ),
-            const SizedBox(height: _paneGap),
-            Expanded(
-              child: CheckoutPane(
-                title: 'Items',
-                child: ListView.separated(
-                  padding: EdgeInsets.zero,
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    final catalog = item.catalogItem(catalogItems);
-                    if (catalog == null) {
-                      return const SizedBox.shrink();
-                    }
-                    return CartItemCard(item: item, catalog: catalog);
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Material(
-        color: colors.background,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(_screenInset),
-            child: Row(
+          body: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: Text(
-                    'Total: ${formatRand(totalCents)}',
-                    textAlign: TextAlign.right,
-                    overflow: TextOverflow.ellipsis,
-                    style: type.titleMedium.copyWith(
-                      color: colors.onBackground,
-                    ),
+                Text(
+                  'Order Summary',
+                  style: type.headlineSmall.copyWith(
+                    color: colors.onBackground,
                   ),
                 ),
-                const SizedBox(width: 16),
-                BlocConsumer<AuthBloc, AuthState>(
-                  listenWhen: (prev, current) => prev.status != current.status && current.status == DataStatus.success,
-                  listener: (context, state) {
-                    context.router.push(const LoginRoute());
-                  },
-                  builder: (context, state) {
-                    return FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: colors.primary,
-                        foregroundColor: colors.onPrimary,
-                        minimumSize: const Size(230, 52),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
-                        ),
-                        textStyle: type.labelLarge,
-                      ),
-                      onPressed: () {
-                        context.read<AuthBloc>().add(AuthEvent.signOut());
+                if (cart != null) ...[
+                  hSpacer16,
+                  Row(
+                    children: [
+                      _OrderId(id: cart.id),
+                      const Spacer(),
+                      _HoldStatus(fulfilled: payment?.fulfilled == true),
+                    ],
+                  ),
+                  hSpacer16,
+                  _HoldTimeline(
+                    createdAt: cart.placedAt ?? cart.createdAt,
+                    fulfilled: payment?.fulfilled == true,
+                    fulfilledAt: payment?.fulfilled == true
+                        ? payment?.updatedAt
+                        : null,
+                  ),
+                ],
+                hSpacer16,
+                _OrderDetails(address: address),
+                hSpacer12,
+                Expanded(
+                  child: CheckoutPane(
+                    title: 'Items',
+                    child: ListView.separated(
+                      padding: EdgeInsets.zero,
+                      itemCount: items.length,
+                      separatorBuilder: (context, index) => hSpacer12,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        final catalog = item.catalogItem(catalogItems);
+                        if (catalog == null) {
+                          return const SizedBox.shrink();
+                        }
+                        return CartItemCard(item: item, catalog: catalog);
                       },
-                      child: const Text('Done'),
-                    );
-                  },
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
+          bottomNavigationBar: Material(
+            color: colors.background,
+            child: SafeArea(
+              child: Padding(
+                padding: allPadding24,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Total: ${formatRand(totalCents)}',
+                        textAlign: TextAlign.right,
+                        overflow: TextOverflow.ellipsis,
+                        style: type.titleMedium.copyWith(
+                          color: colors.onBackground,
+                        ),
+                      ),
+                    ),
+                    wSpacer16,
+                    BlocConsumer<AuthBloc, AuthState>(
+                      listenWhen: (prev, current) =>
+                          prev.status != current.status &&
+                          current.status == DataStatus.success,
+                      listener: (context, state) {
+                        context.router.push(const LoginRoute());
+                      },
+                      builder: (context, state) {
+                        return FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colors.primary,
+                            foregroundColor: colors.onPrimary,
+                            minimumSize: const Size(230, 52),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
+                            textStyle: type.labelLarge,
+                          ),
+                          onPressed: waitingForHold
+                              ? null
+                              : () {
+                                  context.read<AuthBloc>().add(
+                                    AuthEvent.signOut(),
+                                  );
+                                },
+                          child: const Text('Done'),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
-      ),
+        if (waitingForHold) const Positioned.fill(child: _HoldLoadingOverlay()),
+      ],
     );
   }
 }

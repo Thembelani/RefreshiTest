@@ -123,6 +123,7 @@ Map<String, dynamic> _dataFor(
           id: variables['id'] as String,
           token: variables['token'] as String,
           deletedAt: variables['deletedAt'] as String?,
+          fulfilled: variables['fulfilled'] as bool?,
         ),
       };
     case 'DeletePayment':

@@ -8,6 +8,7 @@ import 'package:refreshi_test/application/use_cases/cart_item/update_cart_item_u
 import 'package:refreshi_test/application/use_cases/delivery/create_delivery_use_case.dart';
 import 'package:refreshi_test/application/use_cases/delivery/update_delivery_use_case.dart';
 import 'package:refreshi_test/application/use_cases/payment/create_payment_use_case.dart';
+import 'package:refreshi_test/application/use_cases/payment/update_payment_use_case.dart';
 import 'package:refreshi_test/domain/entities/cart.dart';
 import 'package:refreshi_test/domain/entities/cart_item.dart';
 import 'package:refreshi_test/domain/entities/delivery.dart';
@@ -23,6 +24,7 @@ const _dummyStreet = '12 Long Street';
 const _dummyCity = 'Cape Town';
 const _dummyPostalCode = '8001';
 const _dummyPaymentToken = 'tok_visa_4242';
+const _fulfillmentDelay = Duration(seconds: 10);
 
 @lazySingleton
 class CartBloc extends Bloc<CartEvent, CartState> {
@@ -34,6 +36,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     this._createDeliveryUseCase,
     this._updateDeliveryUseCase,
     this._createPaymentUseCase,
+    this._updatePaymentUseCase,
   ) : super(const CartState()) {
     on<CartEvent>((event, emit) async {
       await event.when(
@@ -47,6 +50,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         selectDeliveryTime: (deliveryTimeId) =>
             _selectDeliveryTime(emit, deliveryTimeId),
         placeOrder: () => _placeOrder(emit),
+        fulfillPayment: () => _fulfillPayment(emit),
       );
     });
   }
@@ -58,6 +62,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   final CreateDeliveryUseCase _createDeliveryUseCase;
   final UpdateDeliveryUseCase _updateDeliveryUseCase;
   final CreatePaymentUseCase _createPaymentUseCase;
+  final UpdatePaymentUseCase _updatePaymentUseCase;
 
   Future<void> _startCart(Emitter<CartState> emit) async {
     emit(
@@ -267,6 +272,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
               id: 0,
               cartId: cart.id,
               token: _dummyPaymentToken,
+              fulfilled: false,
               createdAt: now,
               updatedAt: now,
             ),
@@ -467,6 +473,55 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       (updated) => emit(
         state.copyWith(
           cart: updated,
+          failure: null,
+          status: DataStatus.success,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _fulfillPayment(Emitter<CartState> emit) async {
+    final payment = state.payment;
+    if (payment == null ||
+        payment.fulfilled ||
+        state.fulfillmentRequested) {
+      return;
+    }
+
+    emit(state.copyWith(fulfillmentRequested: true));
+    await Future.delayed(_fulfillmentDelay);
+
+    final current = state.payment;
+    if (current == null || current.fulfilled) {
+      return;
+    }
+
+    final now = DateTime.now();
+    final result = await _updatePaymentUseCase
+        .call(
+          PaymentEntity(
+            id: current.id,
+            cartId: current.cartId,
+            token: current.token,
+            fulfilled: true,
+            createdAt: current.createdAt,
+            updatedAt: now,
+            deletedAt: current.deletedAt,
+          ),
+        )
+        .run();
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          failure: failure,
+          status: DataStatus.error,
+          fulfillmentRequested: false,
+        ),
+      ),
+      (updated) => emit(
+        state.copyWith(
+          payment: updated,
           failure: null,
           status: DataStatus.success,
         ),

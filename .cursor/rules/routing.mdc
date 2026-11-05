@@ -19,4 +19,4 @@ alwaysApply: false
 - After changing routes, run build_runner. Import generated `app_router.gr.dart` (`LoginRoute`, `CatalogRoute`, …).
 - Login `listenWhen` status → success: `context.router.push(const CatalogRoute())`.
 - Order Summary Done: `AuthEvent.signOut()`, then `listenWhen` success: `context.router.push(const LoginRoute())` (push, not `replaceAll`).
-- Catalog Checkout: `push(const CheckoutRoute())` with no arguments. Checkout Complete: `CartEvent.placeOrder()` (sets cart `placedAt`), then `push(const OrderSummaryRoute())` when `isPlaced`.
+- Catalog Checkout: `push(const CheckoutRoute())` with no arguments. Checkout Complete: `CartEvent.placeOrder()` (sets cart `placedAt`), then `push(const OrderSummaryRoute())` when `isPlaced`. Order Summary `initState`: `CartEvent.fulfillPayment()`.

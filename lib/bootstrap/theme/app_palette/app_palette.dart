@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class AppPalette {
-  static const primary = Color(0xFFE41E26);
+  static const primary = Color(0xFF245531);
   static const onPrimary = Color(0xFFFFFFFF);
   static const secondary = Color(0xFF54595F);
   static const onSecondary = Color(0xFFFFFFFF);

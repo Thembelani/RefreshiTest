@@ -7,10 +7,11 @@ alwaysApply: false
 # GraphQL and infrastructure
 
 - Schema: `datasources/graphql/schema.graphql`. Operations: `datasources/graphql/operations/*.graphql` (e.g. `query GetCatalogItems { getCatalogItems { id name sellingPrice } }`).
-- Checkout Complete updates the cart (`placedAt`). No `Order` type, no payment hold. Do not set `deletedAt` except on explicit delete (cart item qty 0 at checkout is the only implicit exception).
+- Checkout Complete updates the cart (`placedAt`). No `Order` type. Payment is created with `fulfilled: false`; `updatePayment` may set `fulfilled: true`. Do not set `deletedAt` except on explicit delete (cart item qty 0 at checkout is the only implicit exception).
 - `build.yaml`: `graphql_codegen` `clients: [graphql]`. Generated files are **libraries** — `import '*.graphql.dart'`. auto_mappr 2: `import 'foo.auto_mappr.dart'` (not `part`).
 - Layout: `graphql_client.dart` (transport) beside `clients/` (`CatalogItemGraphClient`). Client methods return `TaskEither<BaseGraphError, T>` via `TaskEither.tryCatch` + `query$GetCatalogItems()`.
 - No backend: `mockGraphqlLink()` `Link.function`. Include `__typename` on the **Query root** (`Query`) **and** each item (`CatalogItem`). Missing root `__typename` crashes `fromJson`.
+- Persist `MockGraphqlStore` carts, cart items, deliveries, payments, and id counters to SharedPreferences (web: localStorage) after each mutation. Hydrate in the `GraphqlClient` constructor. Catalog items and delivery times stay hardcoded.
 - GraphQL `ID` is `String`; entity `id` may be `int` — AutoMappr `Field.custom` (`CatalogItemGraphModelToEntityMapper.parseId`).
 - Errors: `BaseGraphError` + `GraphQlErrorType`; domain `*Failure`; `toFailure()` / `toCartFailure()` in `infrastructure/mappers`.
 - Repositories map models with `GraphModelMapper` (`mapCreate`, `mapGet`, `mapListItem`, `mapUpdate`) — see repositories rule. Do not convert in the Graph client.

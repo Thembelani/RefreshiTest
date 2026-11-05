@@ -14,4 +14,5 @@ sealed class CartEvent with _$CartEvent {
   const factory CartEvent.selectDeliveryTime({required int deliveryTimeId}) =
       SelectDeliveryTime;
   const factory CartEvent.placeOrder() = PlaceOrder;
+  const factory CartEvent.fulfillPayment() = FulfillPayment;
 }

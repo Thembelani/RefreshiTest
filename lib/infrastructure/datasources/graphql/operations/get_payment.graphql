@@ -3,6 +3,7 @@ query GetPayment($id: ID!) {
         id
         cartId
         token
+        fulfilled
         createdAt
         updatedAt
         deletedAt

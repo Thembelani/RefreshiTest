@@ -1,8 +1,19 @@
-mutation UpdatePayment($id: ID!, $token: String!, $deletedAt: String) {
-    updatePayment(id: $id, token: $token, deletedAt: $deletedAt) {
+mutation UpdatePayment(
+    $id: ID!
+    $token: String!
+    $deletedAt: String
+    $fulfilled: Boolean
+) {
+    updatePayment(
+        id: $id
+        token: $token
+        deletedAt: $deletedAt
+        fulfilled: $fulfilled
+    ) {
         id
         cartId
         token
+        fulfilled
         createdAt
         updatedAt
         deletedAt

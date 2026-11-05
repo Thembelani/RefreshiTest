@@ -76,6 +76,7 @@ class PaymentGraphClient {
             id: '${entity.id}',
             token: entity.token,
             deletedAt: entity.deletedAt?.toUtc().toIso8601String(),
+            fulfilled: entity.fulfilled,
           ),
         ),
       ),

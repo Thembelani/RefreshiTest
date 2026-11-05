@@ -9,7 +9,7 @@ alwaysApply: false
 - Implement `UseCase<EntityType, Params>` from `i_usecase.dart`. `call` returns `TaskEither<BaseFailure, EntityType>`.
 - No arguments: use `NoParams` (`equatable`, `const NoParams()`).
 - Annotate `@LazySingleton()`. Inject the **interface** (`ICatalogRepository`), not the concrete repository.
-- Delegate only; no GraphQL or mapping here. Exception: `SignInUseCase` has no repository — it validates a real email and password `Test1234`, returning `TaskEither<BaseFailure, Unit>`.
+- Delegate only; no GraphQL or mapping here. Exception: `SignInUseCase` has no repository — it validates email `test@user.com` and password `Test1234`, returning `TaskEither<BaseFailure, Unit>`.
 
 ```dart
 @LazySingleton()

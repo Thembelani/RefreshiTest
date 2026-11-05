@@ -2,6 +2,7 @@ class PaymentEntity {
   int id;
   int cartId;
   String token;
+  bool fulfilled;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
@@ -12,6 +13,7 @@ class PaymentEntity {
     required this.token,
     required this.createdAt,
     required this.updatedAt,
+    this.fulfilled = false,
     this.deletedAt,
   });
 }

@@ -3,6 +3,7 @@ mutation CreatePayment($cartId: ID!, $token: String!) {
         id
         cartId
         token
+        fulfilled
         createdAt
         updatedAt
         deletedAt

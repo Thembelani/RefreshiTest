@@ -3,6 +3,7 @@ query GetPayments {
         id
         cartId
         token
+        fulfilled
         createdAt
         updatedAt
         deletedAt

@@ -37,6 +37,7 @@ void main() {
           id: '2',
           cartId: '1',
           token: 'tok_visa_4242',
+          fulfilled: false,
           createdAt: '2026-01-01T00:00:00.000Z',
           updatedAt: '2026-01-01T00:00:00.000Z',
         ),
@@ -50,6 +51,7 @@ void main() {
       expect(payment.id, 2);
       expect(payment.cartId, 1);
       expect(payment.token, 'tok_visa_4242');
+      expect(payment.fulfilled, isFalse);
     });
   });
 

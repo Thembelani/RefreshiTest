@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math' as math;
+
 const _catalogTimestamp = '2026-01-01T00:00:00.000Z';
 
 class MockGraphqlStore {
@@ -5,6 +8,8 @@ class MockGraphqlStore {
   int _nextCartItemId = 1;
   int _nextDeliveryId = 1;
   int _nextPaymentId = 1;
+
+  void Function()? onPersist;
 
   final List<Map<String, dynamic>> catalogItems = [
     _catalogItem(id: '1', name: 'Berry Latte', sellingPrice: 45.5),
@@ -42,6 +47,7 @@ class MockGraphqlStore {
       '__typename': 'Cart',
     };
     carts[id] = cart;
+    _save();
     return cart;
   }
 
@@ -49,16 +55,14 @@ class MockGraphqlStore {
 
   List<Map<String, dynamic>> getCarts() => carts.values.toList();
 
-  Map<String, dynamic>? updateCart({
-    required String id,
-    String? placedAt,
-  }) {
+  Map<String, dynamic>? updateCart({required String id, String? placedAt}) {
     final cart = carts[id];
     if (cart == null) {
       return null;
     }
     cart['updatedAt'] = _now();
     cart['placedAt'] = placedAt;
+    _save();
     return cart;
   }
 
@@ -69,6 +73,7 @@ class MockGraphqlStore {
     }
     cart['deletedAt'] = _now();
     cart['updatedAt'] = cart['deletedAt'];
+    _save();
     return true;
   }
 
@@ -90,6 +95,7 @@ class MockGraphqlStore {
       '__typename': 'CartItem',
     };
     cartItems[id] = item;
+    _save();
     return item;
   }
 
@@ -109,6 +115,7 @@ class MockGraphqlStore {
     item['quantity'] = quantity;
     item['updatedAt'] = _now();
     item['deletedAt'] = deletedAt;
+    _save();
     return item;
   }
 
@@ -120,6 +127,7 @@ class MockGraphqlStore {
     final now = _now();
     item['deletedAt'] = now;
     item['updatedAt'] = now;
+    _save();
     return true;
   }
 
@@ -145,6 +153,7 @@ class MockGraphqlStore {
       '__typename': 'Delivery',
     };
     deliveries[id] = delivery;
+    _save();
     return delivery;
   }
 
@@ -170,6 +179,7 @@ class MockGraphqlStore {
     delivery['deliveryTimeId'] = deliveryTimeId;
     delivery['updatedAt'] = _now();
     delivery['deletedAt'] = deletedAt;
+    _save();
     return delivery;
   }
 
@@ -181,6 +191,7 @@ class MockGraphqlStore {
     final now = _now();
     delivery['deletedAt'] = now;
     delivery['updatedAt'] = now;
+    _save();
     return true;
   }
 
@@ -194,12 +205,14 @@ class MockGraphqlStore {
       'id': id,
       'cartId': cartId,
       'token': token,
+      'fulfilled': false,
       'createdAt': now,
       'updatedAt': now,
       'deletedAt': null,
       '__typename': 'Payment',
     };
     payments[id] = payment;
+    _save();
     return payment;
   }
 
@@ -211,6 +224,7 @@ class MockGraphqlStore {
     required String id,
     required String token,
     String? deletedAt,
+    bool? fulfilled,
   }) {
     final payment = payments[id];
     if (payment == null) {
@@ -219,6 +233,10 @@ class MockGraphqlStore {
     payment['token'] = token;
     payment['updatedAt'] = _now();
     payment['deletedAt'] = deletedAt;
+    if (payment['fulfilled'] == true || fulfilled == true) {
+      payment['fulfilled'] = true;
+    }
+    _save();
     return payment;
   }
 
@@ -230,10 +248,91 @@ class MockGraphqlStore {
     final now = _now();
     payment['deletedAt'] = now;
     payment['updatedAt'] = now;
+    _save();
     return true;
   }
 
   List<Map<String, dynamic>> getDeliveryTimes() => deliveryTimes;
+
+  Map<String, dynamic> toJson() => {
+    'nextCartId': _nextCartId,
+    'nextCartItemId': _nextCartItemId,
+    'nextDeliveryId': _nextDeliveryId,
+    'nextPaymentId': _nextPaymentId,
+    'carts': carts,
+    'cartItems': cartItems,
+    'deliveries': deliveries,
+    'payments': payments,
+  };
+
+  void hydrate(String? encoded) {
+    if (encoded == null || encoded.isEmpty) {
+      return;
+    }
+    final decoded = jsonDecode(encoded);
+    if (decoded is! Map) {
+      return;
+    }
+    _nextCartId = _asInt(decoded['nextCartId']) ?? _nextCartId;
+    _nextCartItemId = _asInt(decoded['nextCartItemId']) ?? _nextCartItemId;
+    _nextDeliveryId = _asInt(decoded['nextDeliveryId']) ?? _nextDeliveryId;
+    _nextPaymentId = _asInt(decoded['nextPaymentId']) ?? _nextPaymentId;
+    carts
+      ..clear()
+      ..addAll(_asRecordMap(decoded['carts']));
+    cartItems
+      ..clear()
+      ..addAll(_asRecordMap(decoded['cartItems']));
+    deliveries
+      ..clear()
+      ..addAll(_asRecordMap(decoded['deliveries']));
+    payments
+      ..clear()
+      ..addAll(_asRecordMap(decoded['payments']));
+    _ensureNextIds();
+  }
+
+  void _save() => onPersist?.call();
+
+  void _ensureNextIds() {
+    _nextCartId = math.max(_nextCartId, _maxId(carts) + 1);
+    _nextCartItemId = math.max(_nextCartItemId, _maxId(cartItems) + 1);
+    _nextDeliveryId = math.max(_nextDeliveryId, _maxId(deliveries) + 1);
+    _nextPaymentId = math.max(_nextPaymentId, _maxId(payments) + 1);
+  }
+}
+
+int? _asInt(Object? value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  return null;
+}
+
+Map<String, Map<String, dynamic>> _asRecordMap(Object? value) {
+  if (value is! Map) {
+    return {};
+  }
+  return value.map((key, record) {
+    return MapEntry(
+      key.toString(),
+      record is Map ? Map<String, dynamic>.from(record) : <String, dynamic>{},
+    );
+  });
+}
+
+int _maxId(Map<String, Map<String, dynamic>> records) {
+  var maxId = 0;
+  for (final id in records.keys) {
+    final parsed = int.tryParse(id);
+    if (parsed != null && parsed > maxId) {
+      maxId = parsed;
+    }
+  }
+  return maxId;
 }
 
 Map<String, dynamic> _catalogItem({

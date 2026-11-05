@@ -8,6 +8,7 @@ import 'package:refreshi_test/application/use_cases/catalog_item/get_catalog_ite
 import 'package:refreshi_test/application/use_cases/delivery/create_delivery_use_case.dart';
 import 'package:refreshi_test/application/use_cases/delivery/update_delivery_use_case.dart';
 import 'package:refreshi_test/application/use_cases/payment/create_payment_use_case.dart';
+import 'package:refreshi_test/application/use_cases/payment/update_payment_use_case.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/cart_graph_client.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/cart_item_graph_client.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/catalog_item_graph_client.dart';
@@ -40,6 +41,8 @@ class MockCreateDeliveryUseCase extends Mock implements CreateDeliveryUseCase {}
 class MockUpdateDeliveryUseCase extends Mock implements UpdateDeliveryUseCase {}
 
 class MockCreatePaymentUseCase extends Mock implements CreatePaymentUseCase {}
+
+class MockUpdatePaymentUseCase extends Mock implements UpdatePaymentUseCase {}
 
 class MockDeliveryGraphClient extends Mock implements DeliveryGraphClient {}
 

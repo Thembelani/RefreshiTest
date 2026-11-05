@@ -7,10 +7,10 @@ alwaysApply: true
 
 Leave these as they are until explicitly asked:
 
-- **Auth** `SignInUseCase` checks for a valid email and password `Test1234`. No auth repository, no GraphQL login. Successful sign-in and `signOut` still wait 2s in `AuthBloc`.
+- **Auth** `SignInUseCase` checks for email `test@user.com` and password `Test1234`. No auth repository, no GraphQL login. Successful sign-in and `signOut` still wait 2s in `AuthBloc`.
 - **Catalog quantities** live in `CatalogScreen` local state (`Map<String, int>`). Checkout is `context.router.push(const CheckoutRoute())` with **no cart args**.
 - **Checkout / Order Summary** still use `dummyCartLines()` and dummy address/card copy.
 - **`CartEntity` / `CartItemEntity` / `ICartRepository` / `ICartItemRepository` exist unused.** Do not add GraphQL, repos, blocs, or UI for them unless asked.
-- Catalog **Checkout** button is not a payment action. Checkout **Complete** finalizes the cart (`CartEvent.placeOrder` → `UpdateCartUseCase` sets `placedAt`) then pushes `OrderSummaryRoute`. No Order entity, no payment hold. Order Summary **Done** calls `AuthEvent.signOut()`.
+- Catalog **Checkout** button is not a payment action. Checkout **Complete** finalizes the cart (`CartEvent.placeOrder` → `UpdateCartUseCase` sets `placedAt`) then pushes `OrderSummaryRoute`. No Order entity. Payment is created with `fulfilled: false`. Order Summary shows cart `id` as the order id and a Created → Fulfilled timeline from `payment.fulfilled`. On that screen, show a loading overlay, wait 10s, then `CartEvent.fulfillPayment` sets `fulfilled: true` once (do not create two updates). **Done** calls `AuthEvent.signOut()`.
 - Assets: `assets/images/logo.png`, `assets/images/product_placeholder.png`. Placeholder images are personal/non-commercial; do not swap in random stock.
 - Do not reintroduce a white catalog AppBar/scaffold override; use `AppTheme` colors.

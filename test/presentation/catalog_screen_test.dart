@@ -4,9 +4,11 @@ import 'package:refreshi_test/get_it.dart';
 import 'package:refreshi_test/main.dart';
 import 'package:refreshi_test/presentation/shared/format_rand.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/widgets/catalog_tile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   setUp(() async {
+    SharedPreferences.setMockInitialValues({});
     await getIt.reset();
     await configureDependencies();
   });
@@ -17,11 +19,11 @@ void main() {
     await tester.pumpWidget(const RefreshiApp());
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(const Key('login-email')), 'a@b.com');
     await tester.enterText(
-      find.byKey(const Key('login-password')),
-      'Test1234',
+      find.byKey(const Key('login-email')),
+      'test@user.com',
     );
+    await tester.enterText(find.byKey(const Key('login-password')), 'Test1234');
     await tester.tap(find.widgetWithText(FilledButton, 'Log in'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 2));
@@ -97,10 +99,7 @@ void main() {
       find.descendant(of: firstTile, matching: find.text('1')),
       findsOneWidget,
     );
-    expect(
-      find.text('Total: ${formatRand(firstPriceCents)}'),
-      findsOneWidget,
-    );
+    expect(find.text('Total: ${formatRand(firstPriceCents)}'), findsOneWidget);
 
     final tileBox = tester.getRect(firstTile);
     final removeBox = tester.getRect(

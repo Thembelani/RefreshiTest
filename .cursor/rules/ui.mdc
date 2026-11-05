@@ -8,11 +8,12 @@ alwaysApply: false
 
 - Colors/type via `context.theme.appColors` and `context.theme.appTypography` (`util_extensions.dart`). Palette: `AppPalette` (primary `#E41E26`). Light theme only. Page transitions: `FadeUpwardsPageTransitionsBuilder` all platforms.
 - Spacing: `allPadding*`, `hPadding*`, `vPadding*`, `hSpacer*`, radius constants — do not invent ad-hoc 24s when a constant exists. Screen inset is 24; pane gap 12. Checkout stacks below 900px width.
-- AppBar: `centerTitle: false`, `toolbarHeight: 72`, `titleSpacing: 24`, logo `Image.asset(..., height: 32)` with keys `login-logo` / `catalog-logo` / `order-summary-logo`. Do not paint a white AppBar override.
+- AppBar: `centerTitle: false`, `toolbarHeight: 72`, `titleSpacing: 24`, logo `Image.asset(..., height: 32)` with keys `catalog-logo` / `order-summary-logo`. Do not paint a white AppBar override. Login has **no AppBar**; the logo (`login-logo`) sits above the form.
 - Catalog search is **60% of the AppBar title slot** (`constraints.maxWidth * 0.6`). Hint: `Search services`.
 - Primary `FilledButton`: `minimumSize: const Size(230, 52)`, padding 32×16, `type.labelLarge`, `colors.primary` / `onPrimary`.
 - Money: `formatRand` / `sellingPriceToCents` in `lib/presentation/shared/format_rand.dart`. Domain `sellingPrice` is a `double` (rands).
 - Catalog grid uses `CatalogItemEntity` from the bloc. Tiles use `product_placeholder.png` on `colors.surface`.
 - Checkout delivery windows come from `DeliveryTimesBloc`. The user must select **one** time; Complete stays disabled until `delivery.deliveryTimeId` is set. Complete finalizes the cart (`placedAt`), then navigates.
-- Keep widget `Key`s tests already use (`login-email`, `login-password`, `catalog-logo`, `cart-totals`, …).
+- Order Summary shows `Order #${cart.id}` and a Created → Fulfilled timeline from `payment.fulfilled` (Pending until the 10s fulfill). While the hold is pending (`isPlaced && !isFulfilled`), show a loading overlay (`hold-loading-overlay`). Keys: `order-id`, `hold-status`, `hold-timeline`, `hold-loading-overlay`.
+- Keep widget `Key`s tests already use (`login-email`, `login-password`, `catalog-logo`, `cart-totals`, `order-id`, …).
 - **One widget per file.** `StatefulWidget` + `State` stay together. Extra widgets go in `part` files of the same library (`part 'foo.dart';` / `part of 'bar.dart';`), not stacked in the parent file and not made public just to split.
