@@ -1,10 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/cart_panel.dart';
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/checkout_pane.dart';
+import 'package:refreshi_test/presentation/state/bloc/auth/auth_bloc.dart';
+import 'package:refreshi_test/presentation/state/utils/data_status.dart';
 
 const _paneGap = 12.0;
 const _screenInset = 24.0;
@@ -19,7 +22,9 @@ class OrderSummaryScreen extends StatelessWidget {
     final type = context.theme.appTypography;
     final lines = dummyCartLines();
     final totalCents = lines.fold(0, (total, line) {
-      final item = catalogItems.firstWhere((item) => item.id == line.service.id);
+      final item = catalogItems.firstWhere(
+        (item) => item.id == line.service.id,
+      );
       return total + item.priceCents * line.quantity;
     });
     final titleStyle = type.bodyMedium.copyWith(color: colors.onSurface);
@@ -55,7 +60,12 @@ class OrderSummaryScreen extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(_screenInset, _screenInset, _screenInset, 0),
+        padding: const EdgeInsets.fromLTRB(
+          _screenInset,
+          _screenInset,
+          _screenInset,
+          0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -114,24 +124,29 @@ class OrderSummaryScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: colors.onPrimary,
-                    minimumSize: const Size(230, 52),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                    textStyle: type.labelLarge,
-                  ),
-                  onPressed: () {
-                    context.router.pushAndPopUntil(
-                      const LoginRoute(),
-                      predicate: (_) => false,
+                BlocConsumer<AuthBloc, AuthState>(
+                  listenWhen: (prev, current) => prev.status != current.status && current.status == DataStatus.success,
+                  listener: (context, state) {
+                    context.router.push(const LoginRoute());
+                  },
+                  builder: (context, state) {
+                    return FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colors.primary,
+                        foregroundColor: colors.onPrimary,
+                        minimumSize: const Size(230, 52),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        textStyle: type.labelLarge,
+                      ),
+                      onPressed: () {
+                        context.read<AuthBloc>().add(AuthEvent.signOut());
+                      },
+                      child: const Text('Done'),
                     );
                   },
-                  child: const Text('Done'),
                 ),
               ],
             ),

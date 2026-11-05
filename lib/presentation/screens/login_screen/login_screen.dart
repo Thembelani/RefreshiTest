@@ -61,17 +61,10 @@ class LoginScreen extends StatelessWidget {
             child: BlocConsumer<AuthBloc, AuthState>(
               bloc: context.read<AuthBloc>(),
               listener: (context, state) {
-                if (state.isLoading) {
-                  //TODO: Show loading overlay
-                  return;
-                }
-                if (state.status == DataStatus.error) {
-                  //TODO: Show error toast
-                  return;
-                }
-                if (state.status == DataStatus.success) {
-                  context.router.push(const CatalogRoute());
-                }
+                context.router.push(const CatalogRoute());
+              },
+              listenWhen: (prev, current) {
+                return prev.status != current.status && current.status == DataStatus.success;
               },
               builder: (context, state) {
                 return Column(
@@ -123,7 +116,7 @@ class LoginScreen extends StatelessWidget {
                         textStyle: type.labelLarge,
                       ),
                       onPressed: () =>
-                          context.read<AuthBloc>().add(AuthEvent.authenticateUser()),
+                          context.read<AuthBloc>().add(AuthEvent.signIn()),
                       child: const Text('Log in'),
                     ),
                   ],

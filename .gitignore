@@ -54,3 +54,5 @@ app.*.map.json
 *.freezed.g.dart
 *.gr.dart
 lib/get_it.config.dart
+*.graphql.dart
+*.auto_mappr.dart

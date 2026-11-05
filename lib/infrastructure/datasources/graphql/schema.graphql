@@ -1,0 +1,9 @@
+type Query {
+    getCatalogItems: [CatalogItem!]!
+}
+
+type CatalogItem {
+    id: ID!
+    name: String!
+    sellingPrice: Float!
+}

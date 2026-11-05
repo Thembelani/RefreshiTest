@@ -1,9 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:refreshi_test/bootstrap/router/app_router.gr.dart';
 import 'package:refreshi_test/bootstrap/theme/theme_extensions/util_extensions.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/catalog_item.dart';
 import 'package:refreshi_test/presentation/screens/catalog_screen/widgets/catalog_tile.dart';
+import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
+import 'package:refreshi_test/presentation/state/utils/data_status.dart';
 
 @RoutePage()
 class CatalogScreen extends StatefulWidget {
@@ -16,6 +19,15 @@ class CatalogScreen extends StatefulWidget {
 class _CatalogScreenState extends State<CatalogScreen> {
   String _query = '';
   final Map<String, int> _quantities = {};
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<CatalogItemsBloc>();
+    if (bloc.state.status == DataStatus.none) {
+      bloc.add(const CatalogItemsEvent.getCatalogItems());
+    }
+  }
 
   int get _itemCount =>
       _quantities.values.fold(0, (total, quantity) => total + quantity);
@@ -129,32 +141,39 @@ class _CatalogScreenState extends State<CatalogScreen> {
           ),
         ],
       ),
-      body: items.isEmpty
-          ? Center(
-              child: Text(
-                'No services match your search.',
-                style: type.bodyLarge.copyWith(color: colors.onSurface),
-              ),
-            )
-          : GridView.builder(
-              padding: const EdgeInsets.all(24),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.62,
-              ),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return CatalogTile(
-                  item: item,
-                  quantity: _quantities[item.id] ?? 0,
-                  onAdd: () => _changeQuantity(item, 1),
-                  onRemove: () => _changeQuantity(item, -1),
+      body: BlocBuilder<CatalogItemsBloc, CatalogItemsState>(
+        bloc: context.read<CatalogItemsBloc>(),
+        builder: (context, state) {
+          return state.items.isEmpty
+              ? Center(
+                  child: Text(
+                    'No services match your search.',
+                    style: type.bodyLarge.copyWith(color: colors.onSurface),
+                  ),
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.all(24),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 200,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.62,
+                  ),
+                  itemCount: state.items.length,
+                  itemBuilder: (context, index) {
+                    final item = state.items[index];
+
+                    return Text("HI");
+                    // return CatalogTile(
+                    //   item: item,
+                    //   quantity: _quantities[item.id] ?? 0,
+                    //   onAdd: () => _changeQuantity(item, 1),
+                    //   onRemove: () => _changeQuantity(item, -1),
+                    // );
+                  },
                 );
-              },
-            ),
+        },
+      ),
       bottomNavigationBar: Material(
         color: colors.surface,
         child: SafeArea(

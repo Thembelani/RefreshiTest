@@ -14,7 +14,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await event.when(
         setEmail: (email) => _setEmail(emit, email),
         setPassword: (password) => _setPassword(emit, password),
-        authenticateUser: () => _authenticateUser(emit),
+        signIn: () => _signIn(emit),
+        signOut: () => _signOut(emit)
       );
     });
   }
@@ -34,12 +35,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(state.copyWith(password: password));
   }
 
-  Future<void> _authenticateUser(
+  Future<void> _signIn(
      Emitter<AuthState> emit
   ) async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(status: DataStatus.loading));
     await Future.delayed(const Duration(seconds: 2));
-    emit(state.copyWith(isLoading: false, status: DataStatus.success));
+    emit(state.copyWith( status: DataStatus.success));
+  }
+
+  Future<void> _signOut(
+     Emitter<AuthState> emit
+  ) async {
+    emit(state.copyWith(status: DataStatus.loading));
+    await Future.delayed(const Duration(seconds: 2));
+    emit(state.copyWith(status: DataStatus.success, email: null, password: null));
   }
 }
 

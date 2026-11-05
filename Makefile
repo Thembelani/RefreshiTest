@@ -16,7 +16,7 @@ install:
 	@cd ios && pod install && cd ..
 
 build:
-	@$(FLUTTER) pub run build_runner build
+	@dart run build_runner build
 
 clean-build:
 	@make clean
