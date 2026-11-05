@@ -7,6 +7,7 @@ alwaysApply: false
 # Dependency injection
 
 - `await configureDependencies()` in `main` before `runApp`. `@InjectableInit` is in `lib/get_it.dart`; generated `get_it.config.dart` is gitignored.
+- SharedPreferences is `@preResolve` from `LocalStorageModule` so `GraphqlClient` can hydrate the mock store in its constructor.
 - Register implementations **as the interface**: `@LazySingleton(as: ICatalogRepository)`. `getIt<ICatalogRepository>()` throws if only the concrete class is registered.
 - Use cases and Graph clients: `@LazySingleton()` / `@lazySingleton` on the concrete class.
 - App-wide blocs are `@lazySingleton`. Provide with **`BlocProvider.value(value: getIt<AuthBloc>())`**. `BlocProvider(create: …)` **closes** the GetIt singleton on dispose (breaks later screens and tests).

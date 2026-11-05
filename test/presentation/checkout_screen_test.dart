@@ -12,11 +12,13 @@ import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/deliv
 import 'package:refreshi_test/presentation/screens/checkout_screen/widgets/service_card.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/seed_cart.dart';
 
 void main() {
   setUp(() async {
+    SharedPreferences.setMockInitialValues({});
     await getIt.reset();
     await configureDependencies();
   });
@@ -137,20 +139,16 @@ void main() {
     expect(completeBox.left, greaterThanOrEqualTo(cartBox.left - 1));
     expect(completeBox.right, closeTo(cartBox.right, 8));
     expect(
-      find.descendant(
-        of: cart,
-        matching: find.text(firstCatalog.name),
-      ),
+      find.descendant(of: cart, matching: find.text(firstCatalog.name)),
       findsOneWidget,
     );
     expect(
       find.descendant(of: cart, matching: find.byType(CartItemCard)),
       findsWidgets,
     );
-    final firstCard = find.descendant(
-      of: cart,
-      matching: find.byType(CartItemCard),
-    ).first;
+    final firstCard = find
+        .descendant(of: cart, matching: find.byType(CartItemCard))
+        .first;
     expect(
       find.descendant(
         of: firstCard,
@@ -165,15 +163,10 @@ void main() {
       ),
       findsOneWidget,
     );
-    final removeFirst = find.byKey(
-      Key('cart-remove-${firstCatalog.id}'),
-    );
+    final removeFirst = find.byKey(Key('cart-remove-${firstCatalog.id}'));
     final firstCardBox = tester.getRect(firstCard);
     final titleBox = tester.getRect(
-      find.descendant(
-        of: firstCard,
-        matching: find.text(firstCatalog.name),
-      ),
+      find.descendant(of: firstCard, matching: find.text(firstCatalog.name)),
     );
     final removeBox = tester.getRect(removeFirst);
     expect(removeBox.right, closeTo(firstCardBox.right, 16));
@@ -206,10 +199,7 @@ void main() {
     await tester.tap(removeFirst);
     await tester.pumpAndSettle();
     expect(
-      find.descendant(
-        of: cart,
-        matching: find.text(firstCatalog.name),
-      ),
+      find.descendant(of: cart, matching: find.text(firstCatalog.name)),
       findsNothing,
     );
     expect(
@@ -223,19 +213,13 @@ void main() {
     );
 
     await tester.scrollUntilVisible(
-      find.descendant(
-        of: cart,
-        matching: find.text(lastCatalog.name),
-      ),
+      find.descendant(of: cart, matching: find.text(lastCatalog.name)),
       200,
       scrollable: find.descendant(of: cart, matching: find.byType(Scrollable)),
     );
 
     expect(
-      find.descendant(
-        of: cart,
-        matching: find.text(lastCatalog.name),
-      ),
+      find.descendant(of: cart, matching: find.text(lastCatalog.name)),
       findsOneWidget,
     );
     expect(tester.getRect(totals).top, closeTo(totalsBox.top, 1));
