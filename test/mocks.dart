@@ -1,13 +1,17 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:refreshi_test/application/use_cases/auth/sign_in_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart/create_cart_use_case.dart';
+import 'package:refreshi_test/application/use_cases/cart/get_cart_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart/update_cart_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/create_cart_item_use_case.dart';
+import 'package:refreshi_test/application/use_cases/cart_item/get_cart_items_use_case.dart';
 import 'package:refreshi_test/application/use_cases/cart_item/update_cart_item_use_case.dart';
 import 'package:refreshi_test/application/use_cases/catalog_item/get_catalog_items_use_case.dart';
 import 'package:refreshi_test/application/use_cases/delivery/create_delivery_use_case.dart';
+import 'package:refreshi_test/application/use_cases/delivery/get_deliveries_use_case.dart';
 import 'package:refreshi_test/application/use_cases/delivery/update_delivery_use_case.dart';
 import 'package:refreshi_test/application/use_cases/payment/create_payment_use_case.dart';
+import 'package:refreshi_test/application/use_cases/payment/get_payments_use_case.dart';
 import 'package:refreshi_test/application/use_cases/payment/update_payment_use_case.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/cart_graph_client.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/clients/cart_item_graph_client.dart';
@@ -26,9 +30,13 @@ class MockCatalogItemGraphClient extends Mock
 
 class MockCreateCartUseCase extends Mock implements CreateCartUseCase {}
 
+class MockGetCartUseCase extends Mock implements GetCartUseCase {}
+
 class MockUpdateCartUseCase extends Mock implements UpdateCartUseCase {}
 
 class MockCreateCartItemUseCase extends Mock implements CreateCartItemUseCase {}
+
+class MockGetCartItemsUseCase extends Mock implements GetCartItemsUseCase {}
 
 class MockUpdateCartItemUseCase extends Mock implements UpdateCartItemUseCase {}
 
@@ -38,9 +46,13 @@ class MockCartItemGraphClient extends Mock implements CartItemGraphClient {}
 
 class MockCreateDeliveryUseCase extends Mock implements CreateDeliveryUseCase {}
 
+class MockGetDeliveriesUseCase extends Mock implements GetDeliveriesUseCase {}
+
 class MockUpdateDeliveryUseCase extends Mock implements UpdateDeliveryUseCase {}
 
 class MockCreatePaymentUseCase extends Mock implements CreatePaymentUseCase {}
+
+class MockGetPaymentsUseCase extends Mock implements GetPaymentsUseCase {}
 
 class MockUpdatePaymentUseCase extends Mock implements UpdatePaymentUseCase {}
 

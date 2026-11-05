@@ -10,6 +10,7 @@ import 'package:refreshi_test/presentation/screens/order_summary_screen/order_su
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/delivery_times/delivery_times_bloc.dart';
+import 'package:refreshi_test/presentation/state/bloc/order_summary/order_summary_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/seed_cart.dart';
@@ -21,19 +22,32 @@ void main() {
     await configureDependencies();
   });
 
-  Future<void> pumpOrderSummary(WidgetTester tester) {
+  Future<void> pumpHost(WidgetTester tester) {
+    return tester.pumpWidget(
+      GlobalProvider.create(
+        materialApp: MaterialApp(theme: AppTheme.theme, home: const SizedBox()),
+      ),
+    );
+  }
+
+  Future<void> pumpOrderSummary(WidgetTester tester, int cartId) {
     return tester.pumpWidget(
       GlobalProvider.create(
         materialApp: MaterialApp(
           theme: AppTheme.theme,
-          home: const OrderSummaryScreen(),
+          home: OrderSummaryScreen(id: cartId),
         ),
       ),
     );
   }
 
-  Future<void> placeSeededCart(WidgetTester tester) async {
+  Future<int> seedUnplacedCart(WidgetTester tester) async {
     await seedCatalogAndCart(tester);
+    return getIt<CartBloc>().state.cart!.id;
+  }
+
+  Future<int> placeSeededCart(WidgetTester tester) async {
+    final cartId = await seedUnplacedCart(tester);
     getIt<DeliveryTimesBloc>().add(const DeliveryTimesEvent.getDeliveryTimes());
     await tester.pumpAndSettle();
     final timeId = getIt<DeliveryTimesBloc>().state.items.first.id;
@@ -41,28 +55,38 @@ void main() {
     await tester.pumpAndSettle();
     getIt<CartBloc>().add(const CartEvent.placeOrder());
     await tester.pump();
+    return cartId;
   }
 
-  testWidgets('order summary shows items, details, and total', (tester) async {
+  testWidgets('order summary loads cart by id, not leftover CartBloc state', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await pumpOrderSummary(tester);
+    await pumpHost(tester);
     await tester.pump();
-    await seedCatalogAndCart(tester);
-
+    final cartId = await seedUnplacedCart(tester);
     final cartItems = getIt<CartBloc>().state.items.active.toList();
     final catalogItems = getIt<CatalogItemsBloc>().state.items;
     final firstCatalog = cartItems.first.catalogItem(catalogItems)!;
     final lastCatalog = cartItems.last.catalogItem(catalogItems)!;
     final totalCents = cartItems.totalCents(catalogItems);
 
-    final cart = getIt<CartBloc>().state.cart!;
+    getIt<CartBloc>().add(const CartEvent.startCart());
+    await tester.pumpAndSettle();
+    expect(getIt<CartBloc>().state.cart?.id, isNot(cartId));
+    expect(getIt<CartBloc>().state.items, isEmpty);
+
+    await pumpOrderSummary(tester, cartId);
+    await tester.pump();
+
+    expect(getIt<OrderSummaryBloc>().state.cart?.id, cartId);
     expect(find.byKey(const Key('order-summary-logo')), findsOneWidget);
     expect(find.text('Order Summary'), findsOneWidget);
-    expect(find.text('Order #${cart.id}'), findsOneWidget);
+    expect(find.text('Order #$cartId'), findsOneWidget);
     expect(find.byKey(const Key('order-id')), findsOneWidget);
     expect(find.byKey(const Key('hold-status')), findsOneWidget);
     expect(find.text('Pending'), findsWidgets);
@@ -104,19 +128,16 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      GlobalProvider.create(
-        materialApp: MaterialApp(theme: AppTheme.theme, home: const SizedBox()),
-      ),
-    );
+    await pumpHost(tester);
     await tester.pump();
-    await placeSeededCart(tester);
-    expect(getIt<CartBloc>().state.isPlaced, isTrue);
-    expect(getIt<CartBloc>().state.payment?.fulfilled, isFalse);
+    final cartId = await placeSeededCart(tester);
 
-    await pumpOrderSummary(tester);
+    await pumpOrderSummary(tester, cartId);
+    await tester.pump();
     await tester.pump();
 
+    expect(getIt<OrderSummaryBloc>().state.isPlaced, isTrue);
+    expect(getIt<OrderSummaryBloc>().state.payment?.fulfilled, isFalse);
     expect(find.byKey(const Key('hold-loading-overlay')), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.text('Pending'), findsWidgets);
@@ -130,7 +151,7 @@ void main() {
     await tester.pump(const Duration(seconds: 10));
     await tester.pump();
 
-    expect(getIt<CartBloc>().state.payment?.fulfilled, isTrue);
+    expect(getIt<OrderSummaryBloc>().state.payment?.fulfilled, isTrue);
     expect(find.byKey(const Key('hold-loading-overlay')), findsNothing);
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.text('Pending'), findsNothing);

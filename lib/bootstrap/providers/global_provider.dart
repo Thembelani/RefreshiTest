@@ -5,6 +5,7 @@ import 'package:refreshi_test/presentation/state/bloc/auth/auth_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/cart/cart_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/catalog_items/catalog_items_bloc.dart';
 import 'package:refreshi_test/presentation/state/bloc/delivery_times/delivery_times_bloc.dart';
+import 'package:refreshi_test/presentation/state/bloc/order_summary/order_summary_bloc.dart';
 
 class GlobalProvider {
   static MultiBlocProvider create({required MaterialApp materialApp}) {
@@ -16,6 +17,7 @@ class GlobalProvider {
         BlocProvider<DeliveryTimesBloc>.value(
           value: getIt<DeliveryTimesBloc>(),
         ),
+        BlocProvider<OrderSummaryBloc>.value(value: getIt<OrderSummaryBloc>()),
       ],
       child: materialApp,
     );

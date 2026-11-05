@@ -21,4 +21,4 @@ if (bloc.state.status == DataStatus.none) {
 
 - Navigate in `BlocListener` / `BlocConsumer` on the screen that should react. Use `listenWhen` so login success and sign-out success are not treated as the same.
 - Auth `signIn` calls `SignInUseCase` (email `test@user.com` + password `Test1234`). On success, `await Future.delayed(const Duration(seconds: 2))` then `DataStatus.success`. `signOut` is still a 2s delayed stub.
-- Order Summary `initState` dispatches `CartEvent.fulfillPayment()`. The bloc waits 10s, then `UpdatePaymentUseCase` sets `fulfilled: true`. Skip if already fulfilled or `fulfillmentRequested`.
+- Order Summary `initState` dispatches `OrderSummaryEvent.load(cartId: id)` (`GetCartUseCase`, `GetCartItemsUseCase`, `GetPaymentsUseCase`, `GetDeliveriesUseCase`, filtered by `cartId`). After that load succeeds for a placed unpaid cart, `OrderSummaryEvent.fulfillPayment()`. The bloc waits 10s, then `UpdatePaymentUseCase` sets `fulfilled: true`. Skip if already fulfilled or `fulfillmentRequested`.

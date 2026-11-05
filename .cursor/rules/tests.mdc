@@ -8,7 +8,7 @@ alwaysApply: false
 
 - Use **mocktail**, not Mockito. Share mocks in `test/mocks.dart`. Do not add `bloc_test` unless it resolves on Dart 3.10.4; drive blocs with `add` + `pumpEventQueue` / `fakeAsync`.
 - Auth 2s delay: construct the bloc **inside** `fakeAsync`, or `tester.pump(const Duration(seconds: 2))` then another `pump`/`pumpAndSettle` so listeners can navigate. Widget login must enter email `test@user.com` and password `Test1234` before tapping Log in.
-- Order Summary fulfill is 10s: after Complete, assert Pending, then `tester.pump(const Duration(seconds: 10))` before asserting Fulfilled. Do not `pumpAndSettle` through that delay if you need the pending state. Drive the bloc with `fakeAsync` + `async.elapse(const Duration(seconds: 10))`.
+- Order Summary fulfill is 10s: pump `OrderSummaryScreen(id: cart.id)` after placing that cart, assert Pending, then `tester.pump(const Duration(seconds: 10))` before asserting Fulfilled. Do not `pumpAndSettle` through that delay if you need the pending state. Drive the bloc with `fakeAsync` + `async.elapse(const Duration(seconds: 10))`.
 - Widget tests using `RefreshiApp` / screens with blocs: `SharedPreferences.setMockInitialValues({}); await getIt.reset(); await configureDependencies();` in `setUp`. Wrap isolated screens with `GlobalProvider.create`.
 - Never `BlocProvider(create: (_) => getIt<AuthBloc>())` — that closes the singleton. Use `.value`.
 - Repository tests mock the Graph client; use the real AutoMappr mapper. Assert `isA<GetCatalogItemFailure>()` (`BaseFailure` has no `==`).

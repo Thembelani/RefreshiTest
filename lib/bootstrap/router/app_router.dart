@@ -10,12 +10,19 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-        AutoRoute(page: LoginRoute.page, path: '/', initial: true),
-        AutoRoute(page: CatalogRoute.page, path: '/catalog',guards: [_authGuard]),
-        AutoRoute(page: CheckoutRoute.page, path: '/checkout', guards: [_authGuard]),
-        AutoRoute(page: OrderSummaryRoute.page, path: '/order-summary', guards: [_authGuard]),
-      ];
-      
-  AuthGuard get _authGuard => getIt<AuthGuard>();
+    AutoRoute(page: LoginRoute.page, path: '/', initial: true),
+    AutoRoute(page: CatalogRoute.page, path: '/catalog', guards: [_authGuard]),
+    AutoRoute(
+      page: CheckoutRoute.page,
+      path: '/checkout',
+      guards: [_authGuard],
+    ),
+    AutoRoute(
+      page: OrderSummaryRoute.page,
+      path: '/order-summary/:id',
+      guards: [_authGuard],
+    ),
+  ];
 
+  AuthGuard get _authGuard => getIt<AuthGuard>();
 }

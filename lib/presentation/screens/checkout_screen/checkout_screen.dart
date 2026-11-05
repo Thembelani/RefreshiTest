@@ -59,7 +59,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       listenWhen: (previous, current) =>
           !previous.isPlaced && current.isPlaced,
       listener: (context, state) {
-        context.router.push(const OrderSummaryRoute());
+        final cart = state.cart;
+        if (cart == null) {
+          return;
+        }
+        context.router.push(OrderSummaryRoute(id: cart.id));
       },
       child: BlocListener<CartBloc, CartState>(
         listenWhen: (previous, current) =>

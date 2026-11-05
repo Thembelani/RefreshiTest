@@ -1,4 +1,3 @@
-import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
@@ -31,7 +30,6 @@ void main() {
   late MockCreateDeliveryUseCase createDelivery;
   late MockUpdateDeliveryUseCase updateDelivery;
   late MockCreatePaymentUseCase createPayment;
-  late MockUpdatePaymentUseCase updatePayment;
   late CartBloc bloc;
 
   final delivery = DeliveryEntity(
@@ -66,23 +64,10 @@ void main() {
     createDelivery = MockCreateDeliveryUseCase();
     updateDelivery = MockUpdateDeliveryUseCase();
     createPayment = MockCreatePaymentUseCase();
-    updatePayment = MockUpdatePaymentUseCase();
-    when(() => createDelivery.call(any())).thenReturn(TaskEither.right(delivery));
+    when(
+      () => createDelivery.call(any()),
+    ).thenReturn(TaskEither.right(delivery));
     when(() => createPayment.call(any())).thenReturn(TaskEither.right(payment));
-    when(() => updatePayment.call(any())).thenAnswer((invocation) {
-      final entity = invocation.positionalArguments.first as PaymentEntity;
-      return TaskEither.right(
-        PaymentEntity(
-          id: entity.id,
-          cartId: entity.cartId,
-          token: entity.token,
-          fulfilled: entity.fulfilled,
-          createdAt: entity.createdAt,
-          updatedAt: entity.updatedAt,
-          deletedAt: entity.deletedAt,
-        ),
-      );
-    });
     when(() => updateCart.call(any())).thenAnswer((invocation) {
       final entity = invocation.positionalArguments.first as CartEntity;
       return TaskEither.right(
@@ -119,7 +104,6 @@ void main() {
       createDelivery,
       updateDelivery,
       createPayment,
-      updatePayment,
     );
   });
 
@@ -141,7 +125,9 @@ void main() {
 
   test('addCatalogItem creates a cart item then increments quantity', () async {
     when(() => createCart.call(any())).thenReturn(TaskEither.right(cart));
-    when(() => createCartItem.call(any())).thenReturn(TaskEither.right(cartItem));
+    when(
+      () => createCartItem.call(any()),
+    ).thenReturn(TaskEither.right(cartItem));
     when(() => updateCartItem.call(any())).thenAnswer((invocation) {
       final entity = invocation.positionalArguments.first as CartItemEntity;
       return TaskEither.right(
@@ -173,7 +159,9 @@ void main() {
 
   test('decrement to zero keeps the item until prepareCheckout', () async {
     when(() => createCart.call(any())).thenReturn(TaskEither.right(cart));
-    when(() => createCartItem.call(any())).thenReturn(TaskEither.right(cartItem));
+    when(
+      () => createCartItem.call(any()),
+    ).thenReturn(TaskEither.right(cartItem));
     when(() => updateCartItem.call(any())).thenAnswer((invocation) {
       final entity = invocation.positionalArguments.first as CartItemEntity;
       return TaskEither.right(
@@ -227,49 +215,6 @@ void main() {
     expect(bloc.state.isPlaced, isTrue);
     expect(bloc.state.payment?.fulfilled, isFalse);
     verify(() => updateCart.call(any())).called(1);
-  });
-
-  test('fulfillPayment waits 10s then sets fulfilled once', () {
-    fakeAsync((async) {
-      when(() => createCart.call(any())).thenReturn(TaskEither.right(cart));
-      final bloc = CartBloc(
-        createCart,
-        updateCart,
-        createCartItem,
-        updateCartItem,
-        createDelivery,
-        updateDelivery,
-        createPayment,
-        updatePayment,
-      );
-
-      bloc.add(const CartEvent.startCart());
-      async.flushMicrotasks();
-      bloc.add(const CartEvent.ensureCheckoutDetails());
-      async.flushMicrotasks();
-      bloc.add(const CartEvent.fulfillPayment());
-      async.flushMicrotasks();
-      bloc.add(const CartEvent.fulfillPayment());
-      async.flushMicrotasks();
-
-      expect(bloc.state.payment?.fulfilled, isFalse);
-      expect(bloc.state.fulfillmentRequested, isTrue);
-      verifyNever(() => updatePayment.call(any()));
-
-      async.elapse(const Duration(seconds: 10));
-      async.flushMicrotasks();
-
-      expect(bloc.state.payment?.fulfilled, isTrue);
-      expect(bloc.state.isFulfilled, isTrue);
-      verify(() => updatePayment.call(any())).called(1);
-
-      bloc.add(const CartEvent.fulfillPayment());
-      async.flushMicrotasks();
-      expect(bloc.state.payment?.fulfilled, isTrue);
-
-      bloc.close();
-      async.flushMicrotasks();
-    });
   });
 
   test('startCart emits error on failure', () async {

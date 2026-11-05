@@ -12,7 +12,6 @@ abstract class CartState with _$CartState {
     @Default(DataStatus.none) DataStatus status,
     BaseFailure? failure,
     @Default(false) bool checkoutPrepared,
-    @Default(false) bool fulfillmentRequested,
   }) = _CartState;
 
   bool get isPlaced => cart?.placedAt != null;

@@ -14,9 +14,9 @@ alwaysApply: false
 | `LoginScreen` | `/` | yes |
 | `CatalogScreen` | `/catalog` | |
 | `CheckoutScreen` | `/checkout` | |
-| `OrderSummaryScreen` | `/order-summary` | |
+| `OrderSummaryScreen` | `/order-summary/:id` | |
 
 - After changing routes, run build_runner. Import generated `app_router.gr.dart` (`LoginRoute`, `CatalogRoute`, …).
 - Login `listenWhen` status → success: `context.router.push(const CatalogRoute())`.
 - Order Summary Done: `AuthEvent.signOut()`, then `listenWhen` success: `context.router.push(const LoginRoute())` (push, not `replaceAll`).
-- Catalog Checkout: `push(const CheckoutRoute())` with no arguments. Checkout Complete: `CartEvent.placeOrder()` (sets cart `placedAt`), then `push(const OrderSummaryRoute())` when `isPlaced`. Order Summary `initState`: `CartEvent.fulfillPayment()`.
+- Catalog Checkout: `push(const CheckoutRoute())` with no arguments. Checkout Complete: `CartEvent.placeOrder()` (sets cart `placedAt`), then `push(OrderSummaryRoute(id: cart.id))` when `isPlaced`. Order Summary `initState`: `OrderSummaryEvent.load(cartId: id)`. After a successful load of a placed unpaid cart, `OrderSummaryEvent.fulfillPayment()`.
