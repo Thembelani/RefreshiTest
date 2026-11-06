@@ -27,12 +27,15 @@ class CartItemRepository implements ICartItemRepository {
     return _client
         .createCartItem(entity)
         .flatMap(
-          (model) => GraphModelMapper.mapCreate<CartItemEntity,
-              Mutation$CreateCartItem$createCartItem>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.cartItemParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapCreate<
+                Mutation$CreateCartItem$createCartItem,
+                CartItemEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.cartItemParseError,
+              ),
         )
         .mapLeft((error) => error.toCartFailure());
   }
@@ -42,12 +45,15 @@ class CartItemRepository implements ICartItemRepository {
     return _client
         .getCartItem(id)
         .flatMap(
-          (model) => GraphModelMapper.mapGet<CartItemEntity,
-              Query$GetCartItem$getCartItem>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.cartItemParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapGet<
+                Query$GetCartItem$getCartItem,
+                CartItemEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.cartItemParseError,
+              ),
         )
         .mapLeft((error) => error.toCartFailure());
   }
@@ -59,12 +65,15 @@ class CartItemRepository implements ICartItemRepository {
         .flatMap(
           (items) => TaskEither.traverseList(
             items,
-            (model) => GraphModelMapper.mapListItem<CartItemEntity,
-                Query$GetCartItems$getCartItems>(
-              model,
-              mapper: _mapper,
-              parseErrorType: GraphQlErrorType.cartItemParseError,
-            ),
+            (model) =>
+                GraphModelMapper.mapListItem<
+                  Query$GetCartItems$getCartItems,
+                  CartItemEntity
+                >(
+                  model,
+                  mapper: _mapper,
+                  parseErrorType: GraphQlErrorType.cartItemParseError,
+                ),
           ),
         )
         .mapLeft((error) => error.toCartFailure());
@@ -77,20 +86,21 @@ class CartItemRepository implements ICartItemRepository {
     return _client
         .updateCartItem(entity)
         .flatMap(
-          (model) => GraphModelMapper.mapUpdate<CartItemEntity,
-              Mutation$UpdateCartItem$updateCartItem>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.cartItemParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapUpdate<
+                Mutation$UpdateCartItem$updateCartItem,
+                CartItemEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.cartItemParseError,
+              ),
         )
         .mapLeft((error) => error.toCartFailure());
   }
 
   @override
   TaskEither<BaseFailure, Unit> deleteCartItem(int id) {
-    return _client
-        .deleteCartItem(id)
-        .mapLeft((error) => error.toCartFailure());
+    return _client.deleteCartItem(id).mapLeft((error) => error.toCartFailure());
   }
 }

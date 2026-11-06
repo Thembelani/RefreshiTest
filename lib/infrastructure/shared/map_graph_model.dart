@@ -3,52 +3,52 @@ import 'package:fpdart/fpdart.dart';
 import 'package:refreshi_test/infrastructure/datasources/graphql/errors/base_graph_error.dart';
 
 class GraphModelMapper {
-  static TaskEither<BaseGraphError, T> mapCreate<T, M>(
-    M model, {
+  static TaskEither<BaseGraphError, Target> mapCreate<Source, Target>(
+    Source model, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
-    return _tryMap<T>(
-      () => mapper.convert<M, T>(model),
+    return _tryMap<Target>(
+      () => mapper.convert<Source, Target>(model),
       parseErrorType: parseErrorType,
     );
   }
 
-  static TaskEither<BaseGraphError, T> mapGet<T, M>(
-    M model, {
+  static TaskEither<BaseGraphError, Target> mapGet<Source, Target >(
+    Source model, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
-    return _tryMap<T>(
-      () => mapper.convert<M, T>(model),
+    return _tryMap<Target>(
+      () => mapper.convert<Source, Target>(model),
       parseErrorType: parseErrorType,
     );
   }
 
-  static TaskEither<BaseGraphError, T> mapListItem<T, M>(
-    M model, {
+  static TaskEither<BaseGraphError, Target> mapListItem<Source, Target>(
+    Source model, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
-    return _tryMap<T>(
-      () => mapper.convert<M, T>(model),
+    return _tryMap<Target>(
+      () => mapper.convert<Source, Target>(model),
       parseErrorType: parseErrorType,
     );
   }
 
-  static TaskEither<BaseGraphError, T> mapUpdate<T, M>(
-    M model, {
+  static TaskEither<BaseGraphError, Target> mapUpdate<Source, Target>(
+    Source model, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
-    return _tryMap<T>(
-      () => mapper.convert<M, T>(model),
+    return _tryMap<Target>(
+      () => mapper.convert<Source, Target>(model),
       parseErrorType: parseErrorType,
     );
   }
 
-  static TaskEither<BaseGraphError, T> _tryMap<T>(
-    T Function() map, {
+  static TaskEither<BaseGraphError, Target> _tryMap<Target>(
+    Target Function() map, {
     required GraphQlErrorType parseErrorType,
   }) {
     return TaskEither.tryCatch(

@@ -8,13 +8,13 @@ alwaysApply: false
 
 - `@LazySingleton(as: IFooRepository)`. Inject the Graph client and AutoMappr mapper. Do not call GraphQL from use cases or blocs.
 - Client returns `TaskEither<BaseGraphError, Model>`. Map to entity with **`GraphModelMapper` static methods** in `infrastructure/shared/map_graph_model.dart`. Do not add local `_mapCreate` / `_tryMap`.
-- Keep **`mapCreate` / `mapGet` / `mapListItem` / `mapUpdate` as separate functions**. Do not collapse them into one generic `map`. Pass both type args: entity then GraphQL model.
+- Keep **`mapCreate` / `mapGet` / `mapListItem` / `mapUpdate` as separate functions**. Do not collapse them into one generic `map`. Pass both type args: GraphQL model (`Source`) then entity (`Target`).
 - Lists: `TaskEither.traverseList` + `mapListItem`. Delete has no entity map — `mapLeft` only.
 - Then `mapLeft` Graph errors (`toCartFailure()` / `toFailure()`).
 
 ```dart
 return _client.createCart().flatMap(
-  (model) => GraphModelMapper.mapCreate<CartEntity, Mutation$CreateCart$createCart>(
+  (model) => GraphModelMapper.mapCreate<Mutation$CreateCart$createCart, CartEntity>(
     model,
     mapper: _mapper,
     parseErrorType: GraphQlErrorType.cartParseError,

@@ -24,12 +24,15 @@ class CatalogRepository implements ICatalogRepository {
         .flatMap(
           (items) => TaskEither.traverseList(
             items,
-            (model) => GraphModelMapper.mapListItem<CatalogItemEntity,
-                Query$GetCatalogItems$getCatalogItems>(
-              model,
-              mapper: _mapper,
-              parseErrorType: GraphQlErrorType.getCatalogItemParseError,
-            ),
+            (model) =>
+                GraphModelMapper.mapListItem<
+                  Query$GetCatalogItems$getCatalogItems,
+                  CatalogItemEntity
+                >(
+                  model,
+                  mapper: _mapper,
+                  parseErrorType: GraphQlErrorType.getCatalogItemParseError,
+                ),
           ),
         )
         .mapLeft((error) => error.toFailure());

@@ -24,12 +24,15 @@ class DeliveryTimeRepository implements IDeliveryTimeRepository {
         .flatMap(
           (items) => TaskEither.traverseList(
             items,
-            (model) => GraphModelMapper.mapListItem<DeliveryTimeEntity,
-                Query$GetDeliveryTimes$getDeliveryTimes>(
-              model,
-              mapper: _mapper,
-              parseErrorType: GraphQlErrorType.deliveryTimeParseError,
-            ),
+            (model) =>
+                GraphModelMapper.mapListItem<
+                  Query$GetDeliveryTimes$getDeliveryTimes,
+                  DeliveryTimeEntity
+                >(
+                  model,
+                  mapper: _mapper,
+                  parseErrorType: GraphQlErrorType.deliveryTimeParseError,
+                ),
           ),
         )
         .mapLeft((error) => error.toDeliveryTimeFailure());

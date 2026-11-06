@@ -25,12 +25,15 @@ class CartRepository implements ICartRepository {
     return _client
         .createCart()
         .flatMap(
-          (model) => GraphModelMapper.mapCreate<CartEntity,
-              Mutation$CreateCart$createCart>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.cartParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapCreate<
+                Mutation$CreateCart$createCart,
+                CartEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.cartParseError,
+              ),
         )
         .mapLeft((error) => error.toCartFailure());
   }
@@ -40,8 +43,7 @@ class CartRepository implements ICartRepository {
     return _client
         .getCart(id)
         .flatMap(
-          (model) =>
-              GraphModelMapper.mapGet<CartEntity, Query$GetCart$getCart>(
+          (model) => GraphModelMapper.mapGet<Query$GetCart$getCart, CartEntity>(
             model,
             mapper: _mapper,
             parseErrorType: GraphQlErrorType.cartParseError,
@@ -57,12 +59,15 @@ class CartRepository implements ICartRepository {
         .flatMap(
           (items) => TaskEither.traverseList(
             items,
-            (model) => GraphModelMapper.mapListItem<CartEntity,
-                Query$GetCarts$getCarts>(
-              model,
-              mapper: _mapper,
-              parseErrorType: GraphQlErrorType.cartParseError,
-            ),
+            (model) =>
+                GraphModelMapper.mapListItem<
+                  Query$GetCarts$getCarts,
+                  CartEntity
+                >(
+                  model,
+                  mapper: _mapper,
+                  parseErrorType: GraphQlErrorType.cartParseError,
+                ),
           ),
         )
         .mapLeft((error) => error.toCartFailure());
@@ -73,12 +78,15 @@ class CartRepository implements ICartRepository {
     return _client
         .updateCart(entity)
         .flatMap(
-          (model) => GraphModelMapper.mapUpdate<CartEntity,
-              Mutation$UpdateCart$updateCart>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.cartParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapUpdate<
+                Mutation$UpdateCart$updateCart,
+                CartEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.cartParseError,
+              ),
         )
         .mapLeft((error) => error.toCartFailure());
   }

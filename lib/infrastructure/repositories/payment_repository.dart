@@ -25,12 +25,15 @@ class PaymentRepository implements IPaymentRepository {
     return _client
         .createPayment(entity)
         .flatMap(
-          (model) => GraphModelMapper.mapCreate<PaymentEntity,
-              Mutation$CreatePayment$createPayment>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.paymentParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapCreate<
+                Mutation$CreatePayment$createPayment,
+                PaymentEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.paymentParseError,
+              ),
         )
         .mapLeft((error) => error.toPaymentFailure());
   }
@@ -40,12 +43,15 @@ class PaymentRepository implements IPaymentRepository {
     return _client
         .getPayment(id)
         .flatMap(
-          (model) => GraphModelMapper.mapGet<PaymentEntity,
-              Query$GetPayment$getPayment>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.paymentParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapGet<
+                Query$GetPayment$getPayment,
+                PaymentEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.paymentParseError,
+              ),
         )
         .mapLeft((error) => error.toPaymentFailure());
   }
@@ -57,12 +63,15 @@ class PaymentRepository implements IPaymentRepository {
         .flatMap(
           (items) => TaskEither.traverseList(
             items,
-            (model) => GraphModelMapper.mapListItem<PaymentEntity,
-                Query$GetPayments$getPayments>(
-              model,
-              mapper: _mapper,
-              parseErrorType: GraphQlErrorType.paymentParseError,
-            ),
+            (model) =>
+                GraphModelMapper.mapListItem<
+                  Query$GetPayments$getPayments,
+                  PaymentEntity
+                >(
+                  model,
+                  mapper: _mapper,
+                  parseErrorType: GraphQlErrorType.paymentParseError,
+                ),
           ),
         )
         .mapLeft((error) => error.toPaymentFailure());
@@ -73,12 +82,15 @@ class PaymentRepository implements IPaymentRepository {
     return _client
         .updatePayment(entity)
         .flatMap(
-          (model) => GraphModelMapper.mapUpdate<PaymentEntity,
-              Mutation$UpdatePayment$updatePayment>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.paymentParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapUpdate<
+                Mutation$UpdatePayment$updatePayment,
+                PaymentEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.paymentParseError,
+              ),
         )
         .mapLeft((error) => error.toPaymentFailure());
   }

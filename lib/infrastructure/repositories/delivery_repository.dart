@@ -27,12 +27,15 @@ class DeliveryRepository implements IDeliveryRepository {
     return _client
         .createDelivery(entity)
         .flatMap(
-          (model) => GraphModelMapper.mapCreate<DeliveryEntity,
-              Mutation$CreateDelivery$createDelivery>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.deliveryParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapCreate<
+                Mutation$CreateDelivery$createDelivery,
+                DeliveryEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.deliveryParseError,
+              ),
         )
         .mapLeft((error) => error.toDeliveryFailure());
   }
@@ -42,12 +45,15 @@ class DeliveryRepository implements IDeliveryRepository {
     return _client
         .getDelivery(id)
         .flatMap(
-          (model) => GraphModelMapper.mapGet<DeliveryEntity,
-              Query$GetDelivery$getDelivery>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.deliveryParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapGet<
+                Query$GetDelivery$getDelivery,
+                DeliveryEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.deliveryParseError,
+              ),
         )
         .mapLeft((error) => error.toDeliveryFailure());
   }
@@ -59,12 +65,15 @@ class DeliveryRepository implements IDeliveryRepository {
         .flatMap(
           (items) => TaskEither.traverseList(
             items,
-            (model) => GraphModelMapper.mapListItem<DeliveryEntity,
-                Query$GetDeliveries$getDeliveries>(
-              model,
-              mapper: _mapper,
-              parseErrorType: GraphQlErrorType.deliveryParseError,
-            ),
+            (model) =>
+                GraphModelMapper.mapListItem<
+                  Query$GetDeliveries$getDeliveries,
+                  DeliveryEntity
+                >(
+                  model,
+                  mapper: _mapper,
+                  parseErrorType: GraphQlErrorType.deliveryParseError,
+                ),
           ),
         )
         .mapLeft((error) => error.toDeliveryFailure());
@@ -77,12 +86,15 @@ class DeliveryRepository implements IDeliveryRepository {
     return _client
         .updateDelivery(entity)
         .flatMap(
-          (model) => GraphModelMapper.mapUpdate<DeliveryEntity,
-              Mutation$UpdateDelivery$updateDelivery>(
-            model,
-            mapper: _mapper,
-            parseErrorType: GraphQlErrorType.deliveryParseError,
-          ),
+          (model) =>
+              GraphModelMapper.mapUpdate<
+                Mutation$UpdateDelivery$updateDelivery,
+                DeliveryEntity
+              >(
+                model,
+                mapper: _mapper,
+                parseErrorType: GraphQlErrorType.deliveryParseError,
+              ),
         )
         .mapLeft((error) => error.toDeliveryFailure());
   }
