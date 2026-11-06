@@ -4,45 +4,45 @@ import 'package:refreshi_test/infrastructure/datasources/graphql/errors/base_gra
 
 class GraphModelMapper {
   static TaskEither<BaseGraphError, Target> mapCreate<Source, Target>(
-    Source model, {
+    Source source, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
     return _tryMap<Target>(
-      () => mapper.convert<Source, Target>(model),
+      () => mapper.convert<Source, Target>(source),
       parseErrorType: parseErrorType,
     );
   }
 
   static TaskEither<BaseGraphError, Target> mapGet<Source, Target >(
-    Source model, {
+    Source source, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
     return _tryMap<Target>(
-      () => mapper.convert<Source, Target>(model),
+      () => mapper.convert<Source, Target>(source),
       parseErrorType: parseErrorType,
     );
   }
 
   static TaskEither<BaseGraphError, Target> mapListItem<Source, Target>(
-    Source model, {
+    Source source, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
     return _tryMap<Target>(
-      () => mapper.convert<Source, Target>(model),
+      () => mapper.convert<Source, Target>(source),
       parseErrorType: parseErrorType,
     );
   }
 
   static TaskEither<BaseGraphError, Target> mapUpdate<Source, Target>(
-    Source model, {
+    Source source, {
     required AutoMapprInterface mapper,
     required GraphQlErrorType parseErrorType,
   }) {
     return _tryMap<Target>(
-      () => mapper.convert<Source, Target>(model),
+      () => mapper.convert<Source, Target>(source),
       parseErrorType: parseErrorType,
     );
   }
